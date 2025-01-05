@@ -14,7 +14,7 @@ const USERS_TABLE = process.env.USERS_TABLE;
 const client = new DynamoDBClient();
 const docClient = DynamoDBDocumentClient.from(client);
 
-app.get("/users/:userId", async (req, res) => {
+app.get("/users/:userId", async (req: any, res: any) => {
     const params = {
         TableName: USERS_TABLE,
         Key: {
@@ -62,7 +62,7 @@ app.post("/users", async (req, res) => {
     }
 });
 
-app.use((_, res, _) => {
+app.use((_: any, res: any, __: any) => {
     return res.status(404).json({
         error: "Not Found",
     });
