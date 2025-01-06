@@ -33,7 +33,9 @@ functions:
   api:
     handler: handler.handler
     events:
-      - httpApi: "*"
+      - httpApi:
+          path: users/{userId}
+          method: get
 
 resources:
   Resources:
