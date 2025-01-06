@@ -33,7 +33,7 @@ functions:
   api:
     handler: handler.handler
     events:
-      - httpApi:
+      - http:
           path: users/{userId}
           method: get
 
