@@ -50,4 +50,24 @@ resources:
         TableName: ${param:tableName}
 
 plugins:
+  - serverless-dynamodb
   - serverless-offline
+
+custom:
+  serverless-dynamodb:
+    stages:
+      - dev
+    start:
+      port: 8000
+      inMemory: true
+      heapInitial: 200m
+      heapMax: 1g
+      migrate: true
+      seed: true
+      convertEmptyValues: true
+    
+    seed:
+      dev:
+        sources:
+          - table: users-table-dev
+            sources: [./seed/users-table-dev.json]
