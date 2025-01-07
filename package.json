@@ -4,7 +4,7 @@
     "description": "",
     "scripts": {
         "dev offline": "serverless offline",
-        "dev development env": "serverless deploy",
+        "dev development env": "serverless deploy --region us-west-2",
         "dynamodb install": "serverless dynamodb install",
         "dynamodb start": "serverless dynamodb start"
     },
