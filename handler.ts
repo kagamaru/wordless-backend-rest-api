@@ -8,15 +8,18 @@ app.use(express.json());
 
 const USERS_TABLE = process.env.USERS_TABLE;
 
-const client = new DynamoDBClient({
+let client = new DynamoDBClient({
     region: "us-west-2",
+    credentials: { accessKeyId: "FAKE", secretAccessKey: "FAKE" },
+    endpoint: "http://localhost:8000",
 });
-// NOTE: ローカル検証時はこちらにする;
-// const client = new DynamoDBClient({
-//     region: "us-west-2",
-//     credentials: { accessKeyId: "FAKE", secretAccessKey: "FAKE" },
-//     endpoint: "http://localhost:8000",
-// });
+
+if (process.env.DEPLOY_ENV !== "offline") {
+    client = new DynamoDBClient({
+        region: "us-west-2",
+    });
+}
+
 const docClient = DynamoDBDocumentClient.from(client);
 
 app.get("/users/:userId", async (req: any, res: any) => {
