@@ -28,6 +28,7 @@ provider:
             - Fn::GetAtt: [UsersTable, Arn]
   environment:
     USERS_TABLE: ${param:tableName}
+    DEPLOY_ENV: ${sls:stage}
 
 functions:
   api:
@@ -58,7 +59,7 @@ plugins:
 custom:
   serverless-dynamodb:
     stages:
-      - dev
+      - offline
     start:
       port: 8000
       inMemory: true
@@ -71,5 +72,5 @@ custom:
     seed:
       dev:
         sources:
-          - table: users-table-dev
-            sources: [./seed/users-table-dev.json]
+          - table: users-table-offline
+            sources: [./seed/users-table-offline.json]
