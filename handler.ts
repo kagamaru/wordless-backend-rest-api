@@ -8,10 +8,12 @@ app.use(express.json());
 
 const USERS_TABLE = process.env.USERS_TABLE;
 
-const client = new DynamoDBClient({});
-// NOTE: ローカル検証時はこちらにする
+const client = new DynamoDBClient({
+    region: "us-west-2",
+});
+// NOTE: ローカル検証時はこちらにする;
 // const client = new DynamoDBClient({
-//     region: "us-east-1",
+//     region: "us-west-2",
 //     credentials: { accessKeyId: "FAKE", secretAccessKey: "FAKE" },
 //     endpoint: "http://localhost:8000",
 // });
@@ -29,8 +31,8 @@ app.get("/users/:userId", async (req: any, res: any) => {
         const command = new GetCommand(params);
         const { Item } = await docClient.send(command);
         if (Item) {
-            const { userId, userName } = Item;
-            res.json({ userId, userName });
+            const { userId, userName, userAvatarUrl } = Item;
+            res.json({ userId, userName, userAvatarUrl });
         } else {
             res.status(404).json({
                 error: 'Could not find user with provided "userId"',
