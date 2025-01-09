@@ -2,24 +2,28 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 import express from "express";
 import serverless from "serverless-http";
+import { GetUserRequest } from "./@types/GetUserRequest";
 
 const app = express();
 app.use(express.json());
 
 const USERS_TABLE = process.env.USERS_TABLE;
 
-const client = new DynamoDBClient({
+let client = new DynamoDBClient({
     region: "us-west-2",
+    credentials: { accessKeyId: "FAKE", secretAccessKey: "FAKE" },
+    endpoint: "http://localhost:8000",
 });
-// NOTE: ローカル検証時はこちらにする;
-// const client = new DynamoDBClient({
-//     region: "us-west-2",
-//     credentials: { accessKeyId: "FAKE", secretAccessKey: "FAKE" },
-//     endpoint: "http://localhost:8000",
-// });
+
+if (process.env.DEPLOY_ENV !== "offline") {
+    client = new DynamoDBClient({
+        region: "us-west-2",
+    });
+}
+
 const docClient = DynamoDBDocumentClient.from(client);
 
-app.get("/users/:userId", async (req: any, res: any) => {
+app.get("/users/:userId", async (req: GetUserRequest, res: any) => {
     const params = {
         TableName: USERS_TABLE,
         Key: {
@@ -39,7 +43,7 @@ app.get("/users/:userId", async (req: any, res: any) => {
             });
         }
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({ error: "Could not retrieve user" });
     }
 });
