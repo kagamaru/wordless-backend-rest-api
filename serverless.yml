@@ -37,6 +37,11 @@ functions:
       - http:
           path: users/{userId}
           method: get
+          cors:
+            origins: 
+              - ${self:custom.frontendUrl.${sls:stage}} 
+            methods:
+              - GET
 
 resources:
   Resources:
@@ -57,6 +62,10 @@ plugins:
   - serverless-offline
 
 custom:
+  frontendUrl:
+    offline: http://localhost:3000/
+    dev: https://develop.d2k4f3iskqkv6l.amplifyapp.com/
+    prod: https://main.d2k4f3iskqkv6l.amplifyapp.com/
   serverless-dynamodb:
     stages:
       - offline
