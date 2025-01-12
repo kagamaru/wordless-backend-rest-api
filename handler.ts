@@ -6,7 +6,6 @@ import { GetUserRequest } from "./@types/GetUserRequest";
 
 const app = express();
 app.use(express.json());
-
 const USERS_TABLE = process.env.USERS_TABLE;
 
 let client = new DynamoDBClient({
@@ -54,4 +53,5 @@ app.use((_: any, res: any, __: any) => {
     });
 });
 
-exports.handler = serverless(app);
+const handler = serverless(app);
+export { app, handler };
