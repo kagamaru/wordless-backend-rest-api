@@ -29,6 +29,7 @@ provider:
   environment:
     USERS_TABLE: ${param:tableName}
     DEPLOY_ENV: ${sls:stage}
+  apiName: ${sls:stage}-wordless-backend
 
 functions:
   api:
