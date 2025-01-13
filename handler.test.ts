@@ -38,7 +38,7 @@ describe("GET /users/:userId", () => {
 
         expect(response.statusCode).toBe(404);
         expect(response.body).toEqual({
-            error: 'Could not find user with provided "userId"',
+            error: "USE-01",
         });
     });
 
@@ -48,7 +48,7 @@ describe("GET /users/:userId", () => {
         const response = await request(app).get("/users/@fuga_fuga");
 
         expect(response.statusCode).toBe(500);
-        expect(response.body).toEqual({ error: "Could not retrieve user" });
+        expect(response.body).toEqual({ error: "USE-02" });
     });
 });
 
@@ -59,6 +59,6 @@ describe("存在しないURLにアクセスした時、", () => {
         const response = await request(app).get("/hoge");
 
         expect(response.statusCode).toBe(404);
-        expect(response.body).toEqual({ error: "Not Found" });
+        expect(response.body).toEqual({ error: "USE-03" });
     });
 });
