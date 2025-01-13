@@ -38,18 +38,18 @@ app.get("/users/:userId", async (req: GetUserRequest, res: any) => {
             res.json({ userId, userName, userAvatarUrl });
         } else {
             res.status(404).json({
-                error: 'Could not find user with provided "userId"',
+                error: "USE-01",
             });
         }
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: "Could not retrieve user" });
+        res.status(500).json({ error: "USE-02" });
     }
 });
 
 app.use((_: any, res: any, __: any) => {
     return res.status(404).json({
-        error: "Not Found",
+        error: "USE-03",
     });
 });
 
