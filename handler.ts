@@ -37,7 +37,7 @@ app.get("/users/:userId", async (req: GetUserRequest, res: any) => {
             const { userId, userName, userAvatarUrl } = Item;
             res.json({ userId, userName, userAvatarUrl });
         } else {
-            res.status(404).json({
+            res.status(500).json({
                 error: "USE-01",
             });
         }
@@ -45,12 +45,6 @@ app.get("/users/:userId", async (req: GetUserRequest, res: any) => {
         console.error(error);
         res.status(500).json({ error: "USE-02" });
     }
-});
-
-app.use((_: any, res: any, __: any) => {
-    return res.status(404).json({
-        error: "USE-03",
-    });
 });
 
 const handler = serverless(app);
