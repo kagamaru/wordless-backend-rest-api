@@ -33,7 +33,7 @@ provider:
 
 functions:
   api:
-    handler: handler.handler
+    handler: handler.getUserHandler
     events:
       - http:
           path: users/{userId}
