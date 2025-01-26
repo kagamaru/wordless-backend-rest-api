@@ -1,11 +1,7 @@
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
-import express from "express";
-import serverless from "serverless-http";
-import { GetUserRequest } from "./@types/GetUserRequest";
 
-const app = express();
-app.use(express.json());
 const USERS_TABLE = process.env.USERS_TABLE;
 
 let client = new DynamoDBClient({
@@ -22,30 +18,46 @@ if (process.env.DEPLOY_ENV !== "offline") {
 
 const docClient = DynamoDBDocumentClient.from(client);
 
-app.get("/users/:userId", async (req: GetUserRequest, res: any) => {
+export const getUserHandler = async (
+    event: APIGatewayProxyEvent,
+): Promise<APIGatewayProxyResult> => {
+    if (!event.pathParameters || !event.pathParameters.userId) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ error: "USE-01" }),
+        };
+    }
+
+    const { userId } = event.pathParameters;
+
     const params = {
         TableName: USERS_TABLE,
         Key: {
-            userId: req.params.userId,
+            userId,
         },
     };
 
     try {
         const command = new GetCommand(params);
         const { Item } = await docClient.send(command);
+
         if (Item) {
             const { userId, userName, userAvatarUrl } = Item;
-            res.json({ userId, userName, userAvatarUrl });
+            return {
+                statusCode: 200,
+                body: JSON.stringify({ userId, userName, userAvatarUrl }),
+            };
         } else {
-            res.status(500).json({
-                error: "USE-01",
-            });
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ error: "USE-02" }),
+            };
         }
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "USE-02" });
+        console.error("Error fetching user:", error);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: "USE-03" }),
+        };
     }
-});
-
-const handler = serverless(app);
-export { app, handler };
+};
