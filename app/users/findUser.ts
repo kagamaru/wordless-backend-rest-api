@@ -18,7 +18,7 @@ if (process.env.DEPLOY_ENV !== "offline") {
 
 const docClient = DynamoDBDocumentClient.from(client);
 
-export const getUserHandler = async (
+export const findUser = async (
     event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
     if (!event.pathParameters || !event.pathParameters.userId) {

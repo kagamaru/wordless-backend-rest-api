@@ -29,7 +29,7 @@ provider:
 
 functions:
   getUserHandler:
-    handler: app/users/handler.getUserHandler
+    handler: app/users/findUser.findUser
     events:
       - http:
           path: users/{userId}
