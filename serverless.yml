@@ -5,11 +5,6 @@ app: wordlesss-backend-rest-api
 # "service" is the name of this project. This will also be added to your AWS resource names.
 service: wordless-backend-rest-api
 
-stages:
-  default:
-    params:
-      tableName: "users-table-${sls:stage}"
-
 provider:
   name: aws
   runtime: nodejs20.x
@@ -27,8 +22,9 @@ provider:
           Resource:
             - Fn::GetAtt: [UsersTable, Arn]
   environment:
-    USERS_TABLE: ${param:tableName}
+    USERS_TABLE: users-table-${sls:stage}
     DEPLOY_ENV: ${sls:stage}
+  # 初回実行時はコメントアウトする
   apiName: wordless-backend-rest-api-${sls:stage}
 
 functions:
@@ -37,6 +33,17 @@ functions:
     events:
       - http:
           path: users/{userId}
+          method: get
+          cors:
+            origins: 
+              - ${self:custom.frontendUrl.${sls:stage}} 
+            methods:
+              - GET
+  fetchEmotes:
+    handler: app/emotes/fetchEmotes.fetchEmotes
+    events:
+      - http:
+          path: emotes/
           method: get
           cors:
             origins: 
@@ -56,7 +63,7 @@ resources:
           - AttributeName: userId
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
-        TableName: ${param:tableName}
+        TableName: users-table-${sls:stage}
 
 plugins:
   - serverless-dynamodb
