@@ -1,9 +1,9 @@
 # "org" ensures this Service is used with the correct Serverless Framework Access Key.
 org: wordless
 # "app" enables Serverless Framework Dashboard features and sharing them with other Services.
-app: wordlesss-backend-user
+app: wordlesss-backend-rest-api
 # "service" is the name of this project. This will also be added to your AWS resource names.
-service: wordless-backend-user
+service: wordless-backend-rest-api
 
 stages:
   default:
@@ -29,11 +29,11 @@ provider:
   environment:
     USERS_TABLE: ${param:tableName}
     DEPLOY_ENV: ${sls:stage}
-  apiName: wordless-backend-${sls:stage}
+  apiName: wordless-backend-rest-api-${sls:stage}
 
 functions:
-  api:
-    handler: handler.getUserHandler
+  getUserHandler:
+    handler: app/users/handler.getUserHandler
     events:
       - http:
           path: users/{userId}
