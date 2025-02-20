@@ -169,8 +169,10 @@ describe("接続時", () => {
         // Act
         const response = await fetchEmotes(
             getHandlerRequest({
-                userId: "@a",
-                numberOfCompletedAcquisitionsCompleted: "10",
+                queryStringParameters: {
+                    userId: "@a",
+                    numberOfCompletedAcquisitionsCompleted: "10",
+                },
             }),
         );
 
@@ -238,8 +240,10 @@ describe("接続時", () => {
 
         await fetchEmotes(
             getHandlerRequest({
-                userId: "@a",
-                numberOfCompletedAcquisitionsCompleted: "10",
+                queryStringParameters: {
+                    userId: "@a",
+                    numberOfCompletedAcquisitionsCompleted: "10",
+                },
             }),
         );
 
@@ -257,9 +261,11 @@ describe("接続時", () => {
 
         await fetchEmotes(
             getHandlerRequest({
-                userId: "@a",
-                numberOfCompletedAcquisitionsCompleted: "10",
-                sequenceNumberStartOfSearch: "8",
+                queryStringParameters: {
+                    userId: "@a",
+                    numberOfCompletedAcquisitionsCompleted: "10",
+                    sequenceNumberStartOfSearch: "8",
+                },
             }),
         );
 
@@ -271,13 +277,13 @@ describe("接続時", () => {
 });
 
 describe("異常系", () => {
-    test("リクエストのpathParametersが空の時、ステータスコード400とEMT-01を返す", async () => {
+    test("リクエストのqueryStringParametersが空の時、ステータスコード400とEMT-01を返す", async () => {
         testSetUp({
             isUserDBSetup: true,
             isEmoteReactionDBSetup: true,
         });
 
-        const response = await fetchEmotes(getHandlerRequest());
+        const response = await fetchEmotes(getHandlerRequest({}));
 
         expect(response.statusCode).toBe(400);
         expect(response.body).toEqual(
@@ -295,7 +301,9 @@ describe("異常系", () => {
 
         const response = await fetchEmotes(
             getHandlerRequest({
-                numberOfCompletedAcquisitionsCompleted: "10",
+                queryStringParameters: {
+                    numberOfCompletedAcquisitionsCompleted: "10",
+                },
             }),
         );
 
@@ -315,8 +323,10 @@ describe("異常系", () => {
 
         const response = await fetchEmotes(
             getHandlerRequest({
-                userId: "",
-                numberOfCompletedAcquisitionsCompleted: "10",
+                queryStringParameters: {
+                    userId: "",
+                    numberOfCompletedAcquisitionsCompleted: "10",
+                },
             }),
         );
 
@@ -336,7 +346,9 @@ describe("異常系", () => {
 
         const response = await fetchEmotes(
             getHandlerRequest({
-                userId: "@a",
+                queryStringParameters: {
+                    userId: "@a",
+                },
             }),
         );
 
@@ -356,8 +368,10 @@ describe("異常系", () => {
 
         const response = await fetchEmotes(
             getHandlerRequest({
-                userId: "@a",
-                numberOfCompletedAcquisitionsCompleted: "0",
+                queryStringParameters: {
+                    userId: "@a",
+                    numberOfCompletedAcquisitionsCompleted: "0",
+                },
             }),
         );
 
@@ -378,8 +392,10 @@ describe("異常系", () => {
 
         const response = await fetchEmotes(
             getHandlerRequest({
-                userId: "@a",
-                numberOfCompletedAcquisitionsCompleted: "10",
+                queryStringParameters: {
+                    userId: "@a",
+                    numberOfCompletedAcquisitionsCompleted: "10",
+                },
             }),
         );
 
@@ -399,8 +415,10 @@ describe("異常系", () => {
 
         const response = await fetchEmotes(
             getHandlerRequest({
-                userId: "@a",
-                numberOfCompletedAcquisitionsCompleted: "10",
+                queryStringParameters: {
+                    userId: "@a",
+                    numberOfCompletedAcquisitionsCompleted: "10",
+                },
             }),
         );
 
@@ -420,8 +438,10 @@ describe("異常系", () => {
 
         const response = await fetchEmotes(
             getHandlerRequest({
-                userId: "@a",
-                numberOfCompletedAcquisitionsCompleted: "10",
+                queryStringParameters: {
+                    userId: "@a",
+                    numberOfCompletedAcquisitionsCompleted: "10",
+                },
             }),
         );
 

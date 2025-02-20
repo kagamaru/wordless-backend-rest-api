@@ -15,7 +15,7 @@ dayjs.locale("ja");
 export const fetchEmotes = async (
     event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
-    if (!event.pathParameters) {
+    if (!event.queryStringParameters) {
         console.error("EMT-01");
         return {
             statusCode: 400,
@@ -29,7 +29,7 @@ export const fetchEmotes = async (
         userId,
         numberOfCompletedAcquisitionsCompleted,
         sequenceNumberStartOfSearch,
-    } = event.pathParameters;
+    } = event.queryStringParameters;
 
     if (
         !userId ||
