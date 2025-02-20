@@ -26,17 +26,36 @@ describe("GET /users/:userId", () => {
         ddbMock.on(GetCommand).resolves(item);
 
         const response = await findUser(
-            getHandlerRequest({ userId: "@fuga_fuga" }),
+            getHandlerRequest({
+                pathParameters: { userId: "@fuga_fuga" },
+            }),
         );
 
         expect(response.statusCode).toBe(200);
         expect(response.body).toEqual(JSON.stringify(item.Item));
     });
 
+    test("リクエストのpathParametersが無い時、USE-01と400エラーを返す", async () => {
+        ddbMock.on(GetCommand).resolves({ Item: null });
+
+        const response = await findUser(getHandlerRequest({}));
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body).toEqual(
+            JSON.stringify({
+                error: "USE-01",
+            }),
+        );
+    });
+
     test("リクエストのuserIdが空の時、USE-01と400エラーを返す", async () => {
         ddbMock.on(GetCommand).resolves({ Item: null });
 
-        const response = await findUser(getHandlerRequest(undefined));
+        const response = await findUser(
+            getHandlerRequest({
+                pathParameters: {},
+            }),
+        );
 
         expect(response.statusCode).toBe(400);
         expect(response.body).toEqual(
@@ -49,7 +68,9 @@ describe("GET /users/:userId", () => {
     test("存在しないuserIdでアクセスしたとき、USE-02と500エラーを返す", async () => {
         ddbMock.on(GetCommand).resolves({ Item: null });
 
-        const response = await findUser(getHandlerRequest({ userId: "@ほげ" }));
+        const response = await findUser(
+            getHandlerRequest({ pathParameters: { userId: "@ほげ" } }),
+        );
 
         expect(response.statusCode).toBe(500);
         expect(response.body).toEqual(
@@ -63,7 +84,9 @@ describe("GET /users/:userId", () => {
         // NOTE: DynamoDBをmock化しない
 
         const response = await findUser(
-            getHandlerRequest({ userId: "@fuga_fuga" }),
+            getHandlerRequest({
+                pathParameters: { userId: "@fuga_fuga" },
+            }),
         );
 
         expect(response.statusCode).toBe(500);
