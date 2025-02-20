@@ -3,10 +3,12 @@ import {
     APIGatewayProxyEventPathParameters,
 } from "aws-lambda";
 
-export const getHandlerRequest = (
-    pathParameters?: APIGatewayProxyEventPathParameters,
-    body?: string,
-): APIGatewayProxyEvent => {
+export const getHandlerRequest = (request: {
+    pathParameters?: APIGatewayProxyEventPathParameters;
+    queryStringParameters?: APIGatewayProxyEventPathParameters;
+    body?: string;
+}): APIGatewayProxyEvent => {
+    const { pathParameters, queryStringParameters, body } = request;
     return {
         pathParameters,
         body,
@@ -15,7 +17,7 @@ export const getHandlerRequest = (
         httpMethod: "",
         isBase64Encoded: false,
         path: "",
-        queryStringParameters: undefined,
+        queryStringParameters,
         multiValueQueryStringParameters: undefined,
         stageVariables: undefined,
         requestContext: undefined,
