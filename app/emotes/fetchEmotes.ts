@@ -1,13 +1,16 @@
-import { GetCommand } from "@aws-sdk/lib-dynamodb";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import dayjs from "dayjs";
 import "dayjs/locale/ja";
 import { Emote } from "@/classes/Emote";
 import { envConfig } from "@/config";
 import { FetchedEmote } from "@/@types";
-import { getDynamoDBClient, getRDSDBClient } from "@/utility";
+import {
+    createResponse,
+    createErrorResponse,
+    getItemFromDynamoDB,
+    getRDSDBClient,
+} from "@/utility";
 
-const docClient = getDynamoDBClient();
 const mysqlClient = getRDSDBClient();
 
 dayjs.locale("ja");
@@ -16,13 +19,9 @@ export const fetchEmotes = async (
     event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
     if (!event.queryStringParameters) {
-        console.error("EMT-01");
-        return {
-            statusCode: 400,
-            body: JSON.stringify({
-                error: "EMT-01",
-            }),
-        };
+        return createErrorResponse(400, {
+            error: "EMT-01",
+        });
     }
 
     const {
@@ -37,13 +36,9 @@ export const fetchEmotes = async (
         !numberOfCompletedAcquisitionsCompleted ||
         userId.trim() === ""
     ) {
-        console.error("EMT-02");
-        return {
-            statusCode: 400,
-            body: JSON.stringify({
-                error: "EMT-02",
-            }),
-        };
+        return createErrorResponse(400, {
+            error: "EMT-02",
+        });
     }
 
     let emotes = new Array<FetchedEmote>();
@@ -59,13 +54,9 @@ export const fetchEmotes = async (
         }
         await mysqlClient.end();
     } catch (error) {
-        console.error("EMT-03");
-        return {
-            statusCode: 500,
-            body: JSON.stringify({
-                error: "EMT-03",
-            }),
-        };
+        return createErrorResponse(500, {
+            error: "EMT-03",
+        });
     }
 
     const response: Array<Emote> = [];
@@ -82,37 +73,25 @@ export const fetchEmotes = async (
             >;
 
         try {
-            userInfo = (
-                await docClient.send(
-                    new GetCommand({
-                        TableName: envConfig.USERS_TABLE,
-                        Key: {
-                            userId: emote.user_id,
-                        },
-                    }),
-                )
-            ).Item;
+            userInfo = await getItemFromDynamoDB<string>(
+                envConfig.USERS_TABLE,
+                {
+                    userId: emote.user_id,
+                },
+            );
         } catch (error) {
-            console.error("EMT-04");
-            return {
-                statusCode: 500,
-                body: JSON.stringify({
-                    error: "EMT-04",
-                }),
-            };
+            return createErrorResponse(500, {
+                error: "EMT-04",
+            });
         }
 
         try {
-            emoteReaction = (
-                await docClient.send(
-                    new GetCommand({
-                        TableName: envConfig.EMOTE_REACTION_TABLE,
-                        Key: {
-                            emoteReactionId: emote.emote_reaction_id,
-                        },
-                    }),
-                )
-            ).Item as Record<"emoteReactionId", string> &
+            emoteReaction = (await getItemFromDynamoDB(
+                envConfig.EMOTE_REACTION_TABLE,
+                {
+                    emoteReactionId: emote.emote_reaction_id,
+                },
+            )) as Record<"emoteReactionId", string> &
                 Record<
                     "emoteReactionEmojis",
                     Array<{
@@ -121,13 +100,9 @@ export const fetchEmotes = async (
                     }>
                 >;
         } catch (error) {
-            console.error("EMT-05");
-            return {
-                statusCode: 500,
-                body: JSON.stringify({
-                    error: "EMT-05",
-                }),
-            };
+            return createErrorResponse(500, {
+                error: "EMT-05",
+            });
         }
 
         response.push(
@@ -150,10 +125,7 @@ export const fetchEmotes = async (
         );
     }
 
-    return {
-        statusCode: 200,
-        body: JSON.stringify({
-            emotes: response,
-        }),
-    };
+    return createResponse({
+        emotes: response,
+    });
 };
