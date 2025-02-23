@@ -17,7 +17,7 @@ export async function getItemFromDynamoDB<T>(
         if (result.Item) {
             return result.Item;
         } else {
-            throw "cannot find error";
+            throw new Error("Cannot find item");
         }
     } catch (error) {
         throw error;

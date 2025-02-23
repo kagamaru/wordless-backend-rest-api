@@ -25,7 +25,7 @@ export const findUser = async (
 
         return createResponse({ userId, userName, userAvatarUrl });
     } catch (error) {
-        if (error === "cannot find error") {
+        if (error.message === "Cannot find item") {
             return createErrorResponse(500, {
                 error: "USE-02",
             });

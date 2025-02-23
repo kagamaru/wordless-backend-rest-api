@@ -1,3 +1,8 @@
+type EmoteReactionEmojiWithNumber = {
+    emojiId: string;
+    numberOfReactions: number;
+};
+
 export class Emote {
     public sequenceNumber: number;
     public emoteId: string;
@@ -34,8 +39,3 @@ export class Emote {
         this.emoteReactionEmojis = emoteReactionEmojis;
     }
 }
-
-type EmoteReactionEmojiWithNumber = {
-    emojiId: string;
-    numberOfReactions: number;
-};

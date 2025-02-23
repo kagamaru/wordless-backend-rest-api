@@ -2,4 +2,3 @@ node_modules
 .env
 .serverless
 .dynamodb
-undefined/temp/tsx-kagam/*
