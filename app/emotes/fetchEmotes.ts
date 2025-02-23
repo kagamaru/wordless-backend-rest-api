@@ -68,13 +68,51 @@ export const fetchEmotes = async (
         };
     }
 
-    const response = await Promise.all(
-        emotes.map(async (emote) => {
-            let userInfo: Record<
-                "userId" | "userAvatarUrl" | "userName",
-                string
+    const response: Array<Emote> = [];
+
+    for (const emote of emotes) {
+        let userInfo: Record<"userId" | "userAvatarUrl" | "userName", string>;
+        let emoteReaction: Record<"emoteReactionId", string> &
+            Record<
+                "emoteReactionEmojis",
+                Array<{
+                    emojiId: `:${string}:`;
+                    numberOfReactions: number;
+                }>
             >;
-            let emoteReaction: Record<"emoteReactionId", string> &
+
+        try {
+            userInfo = (
+                await docClient.send(
+                    new GetCommand({
+                        TableName: envConfig.USERS_TABLE,
+                        Key: {
+                            userId: emote.user_id,
+                        },
+                    }),
+                )
+            ).Item;
+        } catch (error) {
+            console.error("EMT-04");
+            return {
+                statusCode: 500,
+                body: JSON.stringify({
+                    error: "EMT-04",
+                }),
+            };
+        }
+
+        try {
+            emoteReaction = (
+                await docClient.send(
+                    new GetCommand({
+                        TableName: envConfig.EMOTE_REACTION_TABLE,
+                        Key: {
+                            emoteReactionId: emote.emote_reaction_id,
+                        },
+                    }),
+                )
+            ).Item as Record<"emoteReactionId", string> &
                 Record<
                     "emoteReactionEmojis",
                     Array<{
@@ -82,45 +120,18 @@ export const fetchEmotes = async (
                         numberOfReactions: number;
                     }>
                 >;
-            try {
-                userInfo = (
-                    await docClient.send(
-                        new GetCommand({
-                            TableName: envConfig.USERS_TABLE,
-                            Key: {
-                                userId: emote.user_id,
-                            },
-                        }),
-                    )
-                ).Item;
-            } catch (error) {
-                return "UserTableConnectionError";
-            }
+        } catch (error) {
+            console.error("EMT-05");
+            return {
+                statusCode: 500,
+                body: JSON.stringify({
+                    error: "EMT-05",
+                }),
+            };
+        }
 
-            try {
-                // NOTE: ResponseがAny型になってしまうので、as で補正
-                emoteReaction = (
-                    await docClient.send(
-                        new GetCommand({
-                            TableName: envConfig.EMOTE_REACTION_TABLE,
-                            Key: {
-                                emoteReactionId: emote.emote_reaction_id,
-                            },
-                        }),
-                    )
-                ).Item as Record<"emoteReactionId", string> &
-                    Record<
-                        "emoteReactionEmojis",
-                        Array<{
-                            emojiId: `:${string}:`;
-                            numberOfReactions: number;
-                        }>
-                    >;
-            } catch (error) {
-                return "EmoteReactionTableConnectionError";
-            }
-
-            return new Emote(
+        response.push(
+            new Emote(
                 emote.sequence_number,
                 emote.emote_id,
                 userInfo.userName,
@@ -135,36 +146,14 @@ export const fetchEmotes = async (
                 ],
                 userInfo.userAvatarUrl,
                 emoteReaction?.emoteReactionEmojis,
-            );
-        }),
-    );
-
-    if (response.includes("UserTableConnectionError")) {
-        console.error("EMT-04");
-        return {
-            statusCode: 500,
-            body: JSON.stringify({
-                error: "EMT-04",
-            }),
-        };
-    } else if (response.includes("EmoteReactionTableConnectionError")) {
-        console.error("EMT-05");
-        return {
-            statusCode: 500,
-            body: JSON.stringify({
-                error: "EMT-05",
-            }),
-        };
+            ),
+        );
     }
 
     return {
         statusCode: 200,
         body: JSON.stringify({
-            emotes: response.filter(
-                (element) =>
-                    element !== "UserTableConnectionError" &&
-                    element !== "EmoteReactionTableConnectionError",
-            ),
+            emotes: response,
         }),
     };
 };
