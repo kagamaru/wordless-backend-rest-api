@@ -22,8 +22,13 @@ provider:
           Resource:
             - Fn::GetAtt: [UsersTable, Arn]
   environment:
+    EMOTE_REACTION_TABLE: emote-reaction-table-${sls:stage}
     USERS_TABLE: users-table-${sls:stage}
     DEPLOY_ENV: ${sls:stage}
+    DB_HOST: ${env:DB_HOST}
+    DB_USER: ${env:DB_USER}
+    DB_PASSWORD: ${env:DB_PASSWORD}
+    DB_NAME: ${env:DB_NAME}
   # 初回実行時はコメントアウトする
   apiName: wordless-backend-rest-api-${sls:stage}
 
@@ -39,6 +44,9 @@ functions:
               - ${self:custom.frontendUrl.${sls:stage}} 
             methods:
               - GET
+    vpc:
+      securityGroupIds: ${self:custom.security-group-id.${sls:stage}}
+      subnetIds: ${self:custom.vpc_subnet_id.${sls:stage}}
   fetchEmotes:
     handler: app/emotes/fetchEmotes.fetchEmotes
     events:
@@ -50,8 +58,13 @@ functions:
               - ${self:custom.frontendUrl.${sls:stage}} 
             methods:
               - GET
+    vpc:
+      securityGroupIds: ${self:custom.security-group-id.${sls:stage}}
+      subnetIds: ${self:custom.vpc_subnet_id.${sls:stage}}
 
 resources:
+  Conditions:
+    IsOffline: !Equals ["${sls:stage}", "offline"]
   Resources:
     UsersTable:
       Type: AWS::DynamoDB::Table
@@ -64,12 +77,32 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: users-table-${sls:stage}
+    EmoteReactionTable:
+      Type: AWS::DynamoDB::Table
+      Condition: IsOffline
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: emoteReactionId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: emoteReactionId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: emote-reaction-table-${sls:stage}
 
 plugins:
   - serverless-dynamodb
   - serverless-offline
 
 custom:
+  security-group-id:
+    offline: ${env:VPC_SECURITY_GROUP_ID}
+    dev: ${env:VPC_SECURITY_GROUP_ID}
+    prod: ${env:VPC_SECURITY_GROUP_ID}
+  vpc_subnet_id:
+    offline: ${env:VPC_SUBNET_ID}
+    dev: ${env:VPC_SUBNET_ID}
+    prod: ${env:VPC_SUBNET_ID}
   frontendUrl:
     offline: http://localhost:3000/
     dev: https://develop.d2k4f3iskqkv6l.amplifyapp.com/
@@ -91,3 +124,5 @@ custom:
         sources:
           - table: users-table-offline
             sources: [./seed/users-table-offline.json]
+          - table: emote-reaction-table-offline
+            sources: [./seed/emote-reaction-table-offline.json]
