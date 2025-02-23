@@ -1,7 +1,7 @@
-import { APIGatewayProxyEvent } from "aws-lambda";
 import { mockClient } from "aws-sdk-client-mock";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
-import { getUserHandler } from "./handler";
+import { findUser } from "../../app/users/findUser";
+import { getHandlerRequest } from "../testutils/getHandlerRequest";
 
 const ddbMock = mockClient(DynamoDBDocumentClient);
 
@@ -21,41 +21,41 @@ beforeEach(() => {
     ddbMock.reset();
 });
 
-const getHandlerRequest = (
-    userId: string | undefined,
-): APIGatewayProxyEvent => {
-    return {
-        pathParameters: {
-            userId,
-        },
-        body: "",
-        headers: undefined,
-        multiValueHeaders: undefined,
-        httpMethod: "",
-        isBase64Encoded: false,
-        path: "",
-        queryStringParameters: undefined,
-        multiValueQueryStringParameters: undefined,
-        stageVariables: undefined,
-        requestContext: undefined,
-        resource: "",
-    };
-};
-
 describe("GET /users/:userId", () => {
     test("正常時、userId, userName, userAvatarUrlを返す", async () => {
         ddbMock.on(GetCommand).resolves(item);
 
-        const response = await getUserHandler(getHandlerRequest("@fuga_fuga"));
+        const response = await findUser(
+            getHandlerRequest({
+                pathParameters: { userId: "@fuga_fuga" },
+            }),
+        );
 
         expect(response.statusCode).toBe(200);
         expect(response.body).toEqual(JSON.stringify(item.Item));
     });
 
+    test("リクエストのpathParametersが無い時、USE-01と400エラーを返す", async () => {
+        ddbMock.on(GetCommand).resolves({ Item: null });
+
+        const response = await findUser(getHandlerRequest({}));
+
+        expect(response.statusCode).toBe(400);
+        expect(response.body).toEqual(
+            JSON.stringify({
+                error: "USE-01",
+            }),
+        );
+    });
+
     test("リクエストのuserIdが空の時、USE-01と400エラーを返す", async () => {
         ddbMock.on(GetCommand).resolves({ Item: null });
 
-        const response = await getUserHandler(getHandlerRequest(undefined));
+        const response = await findUser(
+            getHandlerRequest({
+                pathParameters: {},
+            }),
+        );
 
         expect(response.statusCode).toBe(400);
         expect(response.body).toEqual(
@@ -68,7 +68,9 @@ describe("GET /users/:userId", () => {
     test("存在しないuserIdでアクセスしたとき、USE-02と500エラーを返す", async () => {
         ddbMock.on(GetCommand).resolves({ Item: null });
 
-        const response = await getUserHandler(getHandlerRequest("@ほげ"));
+        const response = await findUser(
+            getHandlerRequest({ pathParameters: { userId: "@ほげ" } }),
+        );
 
         expect(response.statusCode).toBe(500);
         expect(response.body).toEqual(
@@ -81,7 +83,11 @@ describe("GET /users/:userId", () => {
     test("サーバー内部でのエラー発生時、USE-03と500エラーを返す", async () => {
         // NOTE: DynamoDBをmock化しない
 
-        const response = await getUserHandler(getHandlerRequest("@fuga_fuga"));
+        const response = await findUser(
+            getHandlerRequest({
+                pathParameters: { userId: "@fuga_fuga" },
+            }),
+        );
 
         expect(response.statusCode).toBe(500);
         expect(response.body).toEqual(JSON.stringify({ error: "USE-03" }));
