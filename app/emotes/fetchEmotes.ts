@@ -1,6 +1,4 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import dayjs from "dayjs";
-import "dayjs/locale/ja";
 import { Emote } from "@/classes/Emote";
 import { envConfig } from "@/config";
 import { FetchedEmote } from "@/@types";
@@ -13,15 +11,18 @@ import {
 
 const mysqlClient = getRDSDBClient();
 
-dayjs.locale("ja");
-
 export const fetchEmotes = async (
     event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
+    const originName = event.headers.origin;
     if (!event.queryStringParameters) {
-        return createErrorResponse(400, {
-            error: "EMT-01",
-        });
+        return createErrorResponse(
+            400,
+            {
+                error: "EMT-01",
+            },
+            originName,
+        );
     }
 
     const {
@@ -36,9 +37,13 @@ export const fetchEmotes = async (
         !numberOfCompletedAcquisitionsCompleted ||
         userId.trim() === ""
     ) {
-        return createErrorResponse(400, {
-            error: "EMT-02",
-        });
+        return createErrorResponse(
+            400,
+            {
+                error: "EMT-02",
+            },
+            originName,
+        );
     }
 
     let emotes = new Array<FetchedEmote>();
@@ -54,9 +59,13 @@ export const fetchEmotes = async (
         }
         await mysqlClient.end();
     } catch (error) {
-        return createErrorResponse(500, {
-            error: "EMT-03",
-        });
+        return createErrorResponse(
+            500,
+            {
+                error: "EMT-03",
+            },
+            originName,
+        );
     }
 
     const response: Array<Emote> = [];
@@ -80,9 +89,13 @@ export const fetchEmotes = async (
                 },
             );
         } catch (error) {
-            return createErrorResponse(500, {
-                error: "EMT-04",
-            });
+            return createErrorResponse(
+                500,
+                {
+                    error: "EMT-04",
+                },
+                originName,
+            );
         }
 
         try {
@@ -100,9 +113,13 @@ export const fetchEmotes = async (
                     }>
                 >;
         } catch (error) {
-            return createErrorResponse(500, {
-                error: "EMT-05",
-            });
+            return createErrorResponse(
+                500,
+                {
+                    error: "EMT-05",
+                },
+                originName,
+            );
         }
 
         response.push(
@@ -125,7 +142,10 @@ export const fetchEmotes = async (
         );
     }
 
-    return createResponse({
-        emotes: response,
-    });
+    return createResponse(
+        {
+            emotes: response,
+        },
+        originName,
+    );
 };

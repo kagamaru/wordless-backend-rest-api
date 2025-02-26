@@ -29,6 +29,8 @@ provider:
     DB_USER: ${env:DB_USER}
     DB_PASSWORD: ${env:DB_PASSWORD}
     DB_NAME: ${env:DB_NAME}
+    FRONTEND_URL: ${self:custom.frontend-url.${sls:stage}}
+    ALLOW_ORIGIN: ${self:custom.frontend-url.offline}
   # 初回実行時はコメントアウトする
   apiName: wordless-backend-rest-api-${sls:stage}
 
@@ -39,11 +41,7 @@ functions:
       - http:
           path: users/{userId}
           method: get
-          cors:
-            origins: 
-              - ${self:custom.frontendUrl.${sls:stage}} 
-            methods:
-              - GET
+          cors: true
     vpc:
       securityGroupIds: ${self:custom.security-group-id.${sls:stage}}
       subnetIds: ${self:custom.vpc_subnet_id.${sls:stage}}
@@ -53,11 +51,7 @@ functions:
       - http:
           path: emotes/
           method: get
-          cors:
-            origins: 
-              - ${self:custom.frontendUrl.${sls:stage}} 
-            methods:
-              - GET
+          cors: true
     vpc:
       securityGroupIds: ${self:custom.security-group-id.${sls:stage}}
       subnetIds: ${self:custom.vpc_subnet_id.${sls:stage}}
@@ -103,10 +97,10 @@ custom:
     offline: ${env:VPC_SUBNET_ID}
     dev: ${env:VPC_SUBNET_ID}
     prod: ${env:VPC_SUBNET_ID}
-  frontendUrl:
-    offline: http://localhost:3000/
-    dev: https://develop.d2k4f3iskqkv6l.amplifyapp.com/
-    prod: https://main.d2k4f3iskqkv6l.amplifyapp.com/
+  frontend-url:
+    offline: http://localhost:3000
+    dev: https://develop.d2k4f3iskqkv6l.amplifyapp.com
+    prod: https://main.d2k4f3iskqkv6l.amplifyapp.com
   serverless-dynamodb:
     stages:
       - offline

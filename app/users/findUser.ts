@@ -9,10 +9,15 @@ import {
 export const findUser = async (
     event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
+    const originName = event.headers.origin;
     if (!event.pathParameters || !event.pathParameters.userId) {
-        return createErrorResponse(400, {
-            error: "USE-01",
-        });
+        return createErrorResponse(
+            400,
+            {
+                error: "USE-01",
+            },
+            originName,
+        );
     }
 
     const pathParameterUserId = event.pathParameters.userId;
@@ -23,16 +28,24 @@ export const findUser = async (
             { userId: pathParameterUserId },
         );
 
-        return createResponse({ userId, userName, userAvatarUrl });
+        return createResponse({ userId, userName, userAvatarUrl }, originName);
     } catch (error) {
         if (error.message === "Cannot find item") {
-            return createErrorResponse(500, {
-                error: "USE-02",
-            });
+            return createErrorResponse(
+                500,
+                {
+                    error: "USE-02",
+                },
+                originName,
+            );
         }
 
-        return createErrorResponse(500, {
-            error: "USE-03",
-        });
+        return createErrorResponse(
+            500,
+            {
+                error: "USE-03",
+            },
+            originName,
+        );
     }
 };
