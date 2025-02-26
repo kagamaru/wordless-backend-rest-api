@@ -12,7 +12,9 @@ export const getHandlerRequest = (request: {
     return {
         pathParameters,
         body,
-        headers: undefined,
+        headers: {
+            origin: "http://localhost:3000",
+        },
         multiValueHeaders: undefined,
         httpMethod: "",
         isBase64Encoded: false,
