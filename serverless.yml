@@ -32,6 +32,7 @@ provider:
     DB_NAME: ${env:DB_NAME}
     FRONTEND_URL: ${self:custom.frontend-url.${sls:stage}}
     ALLOW_ORIGIN: ${self:custom.frontend-url.offline}
+    COGNITO_USER_POOL_ARN: ${env:COGNITO_USER_POOL_ARN}
   # 初回実行時はコメントアウトする
   apiName: wordless-backend-rest-api-${sls:stage}
 
@@ -43,6 +44,9 @@ functions:
           path: users/{userId}
           method: get
           cors: true
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId: !Ref ApiGatewayAuthorizer 
     vpc:
       securityGroupIds: ${self:custom.security-group-id.${sls:stage}}
       subnetIds: ${self:custom.vpc_subnet_id.${sls:stage}}
@@ -53,6 +57,9 @@ functions:
           path: emotes/
           method: get
           cors: true
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId: !Ref ApiGatewayAuthorizer 
     vpc:
       securityGroupIds: ${self:custom.security-group-id.${sls:stage}}
       subnetIds: ${self:custom.vpc_subnet_id.${sls:stage}}
@@ -61,6 +68,15 @@ resources:
   Conditions:
     IsOffline: !Equals ["${sls:stage}", "offline"]
   Resources:
+    ApiGatewayAuthorizer:
+      Type: AWS::ApiGateway::Authorizer
+      Properties:
+        Name: CognitoAuthorizer
+        Type: COGNITO_USER_POOLS
+        RestApiId: !Ref ApiGatewayRestApi
+        IdentitySource: method.request.header.Authorization
+        ProviderARNs:
+          - ${env:COGNITO_USER_POOL_ARN}
     UsersTable:
       Type: AWS::DynamoDB::Table
       Properties:
