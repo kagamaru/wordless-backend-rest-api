@@ -37,6 +37,19 @@ provider:
   apiName: wordless-backend-rest-api-${sls:stage}
 
 functions:
+  login:
+    handler: app/auth/login.login
+    events:
+      - http:
+          path: auth/login
+          method: post
+          cors: true
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId: !Ref ApiGatewayAuthorizer 
+    vpc:
+      securityGroupIds: ${self:custom.security-group-id.${sls:stage}}
+      subnetIds: ${self:custom.vpc_subnet_id.${sls:stage}}
   getUserHandler:
     handler: app/users/findUser.findUser
     events:
