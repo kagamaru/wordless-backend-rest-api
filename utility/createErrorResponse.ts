@@ -1,9 +1,9 @@
 export function createErrorResponse(
-    statusCode: 400 | 500,
+    statusCode: 400 | 401 | 500,
     responseBody: { error: string },
     originName: string,
 ): {
-    statusCode: 400 | 500;
+    statusCode: 400 | 401 | 500;
     body: string;
     headers: {
         "Access-Control-Allow-Origin": string;
