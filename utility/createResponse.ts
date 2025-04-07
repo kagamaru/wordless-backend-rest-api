@@ -16,7 +16,7 @@ export function createResponse(
         statusCode: 200,
         body: JSON.stringify(responseBody),
         headers: {
-            "Set-Cookie": token ? encodeURIComponent(token) : "",
+            "Set-Cookie": token ?? undefined,
             "Access-Control-Allow-Origin":
                 originName === process.env.ALLOW_ORIGIN
                     ? process.env.ALLOW_ORIGIN
