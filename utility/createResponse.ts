@@ -8,6 +8,7 @@ export function createResponse(
     headers: {
         "Set-Cookie": string;
         "Access-Control-Allow-Origin": string;
+        "Access-Control-Allow-Credentials": true;
         "Access-Control-Allow-Headers": "Content-Type";
         "Access-Control-Allow-Methods": "OPTIONS, POST, GET";
     };
@@ -21,6 +22,7 @@ export function createResponse(
                 originName === process.env.ALLOW_ORIGIN
                     ? process.env.ALLOW_ORIGIN
                     : process.env.FRONTEND_URL,
+            "Access-Control-Allow-Credentials": true,
             "Access-Control-Allow-Headers": "Content-Type",
             "Access-Control-Allow-Methods": "OPTIONS, POST, GET",
         },
