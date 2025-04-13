@@ -1,3 +1,5 @@
+import { envConfig } from "@/config";
+
 export function createErrorResponse(
     statusCode: 400 | 401 | 500,
     responseBody: { error: string },
@@ -17,9 +19,9 @@ export function createErrorResponse(
         body: JSON.stringify(responseBody),
         headers: {
             "Access-Control-Allow-Origin":
-                originName === process.env.ALLOW_ORIGIN
-                    ? process.env.ALLOW_ORIGIN
-                    : process.env.FRONTEND_URL,
+                originName === envConfig.ALLOW_ORIGIN
+                    ? envConfig.ALLOW_ORIGIN
+                    : envConfig.FRONTEND_URL,
             "Access-Control-Allow-Headers": "Content-Type",
             "Access-Control-Allow-Methods": "OPTIONS, POST, GET",
         },

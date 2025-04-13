@@ -1,3 +1,5 @@
+import { envConfig } from "@/config";
+
 export function createResponse(
     responseBody: Object,
     originName: string,
@@ -19,9 +21,9 @@ export function createResponse(
         headers: {
             "Set-Cookie": token ?? undefined,
             "Access-Control-Allow-Origin":
-                originName === process.env.ALLOW_ORIGIN
-                    ? process.env.ALLOW_ORIGIN
-                    : process.env.FRONTEND_URL,
+                originName === envConfig.ALLOW_ORIGIN
+                    ? envConfig.ALLOW_ORIGIN
+                    : envConfig.FRONTEND_URL,
             "Access-Control-Allow-Credentials": true,
             "Access-Control-Allow-Headers": "Content-Type",
             "Access-Control-Allow-Methods": "OPTIONS, POST, GET",
