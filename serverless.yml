@@ -32,34 +32,31 @@ provider:
     DB_NAME: ${env:DB_NAME}
     FRONTEND_URL: ${self:custom.frontend-url.${sls:stage}}
     ALLOW_ORIGIN: ${self:custom.frontend-url.offline}
-    COGNITO_USER_POOL_ARN: ${env:COGNITO_USER_POOL_ARN}
+    COGNITO_AUTHORIZER_ID: ${env:COGNITO_AUTHORIZER_ID}
   # 初回実行時はコメントアウトする
   apiName: wordless-backend-rest-api-${sls:stage}
 
 functions:
-  login:
-    handler: app/auth/login.login
-    events:
-      - http:
-          path: auth/login
-          method: post
-          cors: true
-          authorizer:
-            type: COGNITO_USER_POOLS
-            authorizerId: !Ref ApiGatewayAuthorizer 
-    vpc:
-      securityGroupIds: ${self:custom.security-group-id.${sls:stage}}
-      subnetIds: ${self:custom.vpc_subnet_id.${sls:stage}}
   getUserHandler:
     handler: app/users/findUser.findUser
     events:
       - http:
           path: users/{userId}
           method: get
-          cors: true
+          cors:
+            origin: ${env:FRONTEND_URL}
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Requested-With
+            methods:
+              - POST
+              - OPTIONS
           authorizer:
             type: COGNITO_USER_POOLS
-            authorizerId: !Ref ApiGatewayAuthorizer 
+            authorizerId: ${env:COGNITO_AUTHORIZER_ID}
     vpc:
       securityGroupIds: ${self:custom.security-group-id.${sls:stage}}
       subnetIds: ${self:custom.vpc_subnet_id.${sls:stage}}
@@ -69,10 +66,21 @@ functions:
       - http:
           path: emotes/
           method: get
-          cors: true
+          cors:
+            origin: ${env:FRONTEND_URL}
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Requested-With
+            methods:
+              - GET
+              - POST
+              - OPTIONS
           authorizer:
             type: COGNITO_USER_POOLS
-            authorizerId: !Ref ApiGatewayAuthorizer 
+            authorizerId: ${env:COGNITO_AUTHORIZER_ID}
     vpc:
       securityGroupIds: ${self:custom.security-group-id.${sls:stage}}
       subnetIds: ${self:custom.vpc_subnet_id.${sls:stage}}
@@ -103,7 +111,6 @@ resources:
         TableName: users-table-${sls:stage}
     EmoteReactionTable:
       Type: AWS::DynamoDB::Table
-      Condition: IsOffline
       Properties:
         AttributeDefinitions:
           - AttributeName: emoteReactionId
