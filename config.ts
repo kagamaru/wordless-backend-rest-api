@@ -4,9 +4,8 @@ export const envConfig = {
     EMOTE_TABLE: process.env.EMOTE_TABLE,
     EMOTE_REACTION_TABLE: process.env.EMOTE_REACTION_TABLE,
     USERS_TABLE: process.env.USERS_TABLE,
-    COGNITO_USER_POOL_ARN: process.env.COGNITO_USER_POOL_ARN,
-    COGNITO_CLIENT_ID: process.env.COGNITO_CLIENT_ID,
-    AWS_REGION: process.env.AWS_REGION,
+    FRONTEND_URL: process.env.FRONTEND_URL,
+    ALLOW_ORIGIN: process.env.ALLOW_ORIGIN,
 };
 
 export const dbConfig = {
