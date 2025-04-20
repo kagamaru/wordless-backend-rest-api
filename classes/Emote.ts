@@ -1,6 +1,7 @@
 type EmoteReactionEmojiWithNumber = {
     emojiId: string;
     numberOfReactions: number;
+    reactedUserIds: string[];
 };
 
 export class Emote {
@@ -15,7 +16,9 @@ export class Emote {
     public emoteReactionEmojis: Array<{
         emojiId: string;
         numberOfReactions: number;
+        reactedUserIds: string[];
     }>;
+    public totalNumberOfReactions: number;
 
     constructor(
         sequenceNumber: number,
@@ -28,6 +31,12 @@ export class Emote {
         userAvatarUrl: string,
         emoteReactionEmojis: Array<EmoteReactionEmojiWithNumber>,
     ) {
+        const totalNumberOfReactions =
+            emoteReactionEmojis.reduce(
+                (sum, reaction) => sum + reaction.numberOfReactions,
+                0,
+            ) ?? 0;
+
         this.sequenceNumber = sequenceNumber;
         this.emoteId = emoteId;
         this.userName = userName;
@@ -37,5 +46,6 @@ export class Emote {
         this.emoteEmojis = emoteEmojis;
         this.userAvatarUrl = userAvatarUrl;
         this.emoteReactionEmojis = emoteReactionEmojis;
+        this.totalNumberOfReactions = totalNumberOfReactions;
     }
 }
