@@ -39,11 +39,13 @@ const emoteReactionTableItemForUserA = {
         emoteReactionEmojis: [
             {
                 emojiId: ":snake:",
-                numberOfReactions: 23,
+                numberOfReactions: 2,
+                reactedUserIds: ["@a", "@b"],
             },
             {
                 emojiId: ":smile",
                 numberOfReactions: 1,
+                reactedUserIds: ["@a"],
             },
         ],
     },
@@ -55,7 +57,8 @@ const emoteReactionTableItemForUserB = {
         emoteReactionEmojis: [
             {
                 emojiId: ":party_parrot:",
-                numberOfReactions: 100,
+                numberOfReactions: 2,
+                reactedUserIds: ["@a", "@b"],
             },
         ],
     },
@@ -198,7 +201,8 @@ describe("接続時", () => {
                         [
                             {
                                 emojiId: ":party_parrot:",
-                                numberOfReactions: 100,
+                                numberOfReactions: 2,
+                                reactedUserIds: ["@a", "@b"],
                             },
                         ],
                     ),
@@ -219,11 +223,13 @@ describe("接続時", () => {
                         [
                             {
                                 emojiId: ":snake:",
-                                numberOfReactions: 23,
+                                numberOfReactions: 2,
+                                reactedUserIds: ["@a", "@b"],
                             },
                             {
                                 emojiId: ":smile",
                                 numberOfReactions: 1,
+                                reactedUserIds: ["@a"],
                             },
                         ],
                     ),
