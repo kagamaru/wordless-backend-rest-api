@@ -78,6 +78,7 @@ export const fetchEmotes = async (
                 Array<{
                     emojiId: `:${string}:`;
                     numberOfReactions: number;
+                    reactedUserIds: string[];
                 }>
             >;
 
@@ -110,6 +111,7 @@ export const fetchEmotes = async (
                     Array<{
                         emojiId: `:${string}:`;
                         numberOfReactions: number;
+                        reactedUserIds: string[];
                     }>
                 >;
         } catch (error) {
