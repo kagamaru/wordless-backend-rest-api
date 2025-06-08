@@ -1,7 +1,7 @@
 import { mockClient } from "aws-sdk-client-mock";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
-import { findUser } from "../../app/users/findUser";
-import { getHandlerRequest } from "../testutils/getHandlerRequest";
+import { findUser } from "@/app/users/findUser";
+import { getHandlerRequest } from "@/test/testutils/getHandlerRequest";
 
 const ddbMock = mockClient(DynamoDBDocumentClient);
 
@@ -65,14 +65,14 @@ describe("GET /users/:userId", () => {
         );
     });
 
-    test("存在しないuserIdでアクセスしたとき、USE-02と500エラーを返す", async () => {
+    test("存在しないuserIdでアクセスしたとき、USE-02と404エラーを返す", async () => {
         ddbMock.on(GetCommand).resolves({ Item: null });
 
         const response = await findUser(
             getHandlerRequest({ pathParameters: { userId: "@ほげ" } }),
         );
 
-        expect(response.statusCode).toBe(500);
+        expect(response.statusCode).toBe(404);
         expect(response.body).toEqual(
             JSON.stringify({
                 error: "USE-02",
@@ -80,8 +80,8 @@ describe("GET /users/:userId", () => {
         );
     });
 
-    test("サーバー内部でのエラー発生時、USE-03と500エラーを返す", async () => {
-        // NOTE: DynamoDBをmock化しない
+    test("UserTableとの接続に失敗したとき、USE-03と500エラーを返す", async () => {
+        ddbMock.on(GetCommand).rejects(new Error());
 
         const response = await findUser(
             getHandlerRequest({
