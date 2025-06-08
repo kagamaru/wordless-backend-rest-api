@@ -32,7 +32,7 @@ export const findUser = async (
     } catch (error) {
         if (error.message === "Cannot find item") {
             return createErrorResponse(
-                500,
+                404,
                 {
                     error: "USE-02",
                 },

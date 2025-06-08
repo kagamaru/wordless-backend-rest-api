@@ -1,11 +1,11 @@
 import { envConfig } from "@/config";
 
 export function createErrorResponse(
-    statusCode: 400 | 401 | 500,
+    statusCode: 400 | 401 | 404 | 500,
     responseBody: { error: string },
     originName: string,
 ): {
-    statusCode: 400 | 401 | 500;
+    statusCode: 400 | 401 | 404 | 500;
     body: string;
     headers: {
         "Access-Control-Allow-Origin": string;
