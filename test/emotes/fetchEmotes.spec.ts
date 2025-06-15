@@ -67,7 +67,7 @@ const emoteReactionTableItemForUserB = {
 const usersTableItemForA = {
     Item: {
         userId: "@a",
-        userAvatarUrl: "https://a.png",
+        userAvatarUrl: "https://image.test/a.png",
         userName: "A",
     },
 };
@@ -75,7 +75,7 @@ const usersTableItemForA = {
 const usersTableItemForB = {
     Item: {
         userId: "@b",
-        userAvatarUrl: "https://b.png",
+        userAvatarUrl: "https://image.test/b.png",
         userName: "B",
     },
 };
@@ -197,7 +197,7 @@ describe("接続時", () => {
                             { emojiId: ":sad:" },
                             { emojiId: ":party_parrot:" },
                         ],
-                        "https://b.png",
+                        "https://image.test/b.png",
                         [
                             {
                                 emojiId: ":party_parrot:",
@@ -219,7 +219,7 @@ describe("接続時", () => {
                             { emojiId: ":smile:" },
                             { emojiId: ":party_parrot:" },
                         ],
-                        "https://a.png",
+                        "https://image.test/a.png",
                         [
                             {
                                 emojiId: ":snake:",
