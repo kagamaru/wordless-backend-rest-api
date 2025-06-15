@@ -9,7 +9,7 @@ const item = {
     Item: {
         userId: "@fuga_fuga",
         userName: "Fuga Fuga",
-        userAvatarUrl: "https://b.png",
+        userAvatarUrl: "https://image.test/b.png",
     },
 };
 
