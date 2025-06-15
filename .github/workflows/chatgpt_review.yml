@@ -1,0 +1,27 @@
+name: ChatGPT Code Review
+
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches: develop
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: anc95/ChatGPT-CodeReview@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.WORDLESS_API_KEY}}
+          LANGUAGE: Japanese
+          OPENAI_API_ENDPOINT: https://api.openai.com/v1
+          MODEL: gpt-4o-mini
+          PROMPT: あなたはシニアエンジニアです。コードレビューして。レビューで問題点を見つけた場合、問題点と問題点を修正するためのコードを出力してください。問題点を修正することで発生するメリット、デメリットについて出力してください。
+          top_p: 1
+          temperature: 1
+          max_tokens: 3000
+          MAX_PATCH_LENGTH: 4000
