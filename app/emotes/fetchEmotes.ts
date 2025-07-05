@@ -62,7 +62,6 @@ export const fetchEmotes = async (
                 ],
             );
         }
-        await mysqlClient.end();
     } catch (error) {
         return createErrorResponse(
             500,
@@ -71,6 +70,8 @@ export const fetchEmotes = async (
             },
             originName,
         );
+    } finally {
+        await mysqlClient.end();
     }
 
     const response: Array<Emote> = [];
