@@ -1,8 +1,8 @@
 import { mockClient } from "aws-sdk-client-mock";
-import { fetchEmotes } from "@/app/emotes/fetchEmotes";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
+import { fetchEmotes } from "@/app/emotes/fetchEmotes";
 import { Emote } from "@/classes/Emote";
-import { getHandlerRequest } from "../testutils/getHandlerRequest";
+import { getHandlerRequest } from "@/test/testutils/getHandlerRequest";
 
 const ddbMock = mockClient(DynamoDBDocumentClient);
 
@@ -103,7 +103,8 @@ jest.mock("@/utility", () => {
     return {
         ...actual,
         getRDSDBClient: jest.fn(() => ({
-            query: (sql: string) => getRDSDBClientQueryMock(sql),
+            query: (sql: string, params: any[]) =>
+                getRDSDBClientQueryMock(sql, params),
             end: () => {},
         })),
     };
@@ -254,7 +255,8 @@ describe("接続時", () => {
         );
 
         expect(getRDSDBClientQueryMock).toHaveBeenCalledWith(
-            "SELECT * FROM wordlessdb.emote_table WHERE is_deleted = 0 ORDER BY emote_datetime DESC LIMIT 10",
+            "SELECT * FROM wordlessdb.emote_table WHERE is_deleted = 0 ORDER BY emote_datetime DESC LIMIT ?",
+            ["10"],
         );
         expect(getRDSDBClientQueryMock).toHaveBeenCalledTimes(1);
     });
@@ -276,7 +278,8 @@ describe("接続時", () => {
         );
 
         expect(getRDSDBClientQueryMock).toHaveBeenCalledWith(
-            "SELECT * FROM wordlessdb.emote_table WHERE is_deleted = 0 AND emote_datetime <= (SELECT emote_datetime FROM wordlessdb.emote_table WHERE sequenceNumber = 8 ORDER BY emote_datetime DESC LIMIT 1) ORDER BY emote_datetime DESC LIMIT 10",
+            "SELECT * FROM wordlessdb.emote_table WHERE is_deleted = 0 AND emote_datetime <= (SELECT emote_datetime FROM wordlessdb.emote_table WHERE sequenceNumber = ? ORDER BY emote_datetime DESC LIMIT 1) ORDER BY emote_datetime DESC LIMIT ?",
+            ["8", "10"],
         );
         expect(getRDSDBClientQueryMock).toHaveBeenCalledTimes(1);
     });
