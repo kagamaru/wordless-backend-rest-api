@@ -51,14 +51,14 @@ export const fetchEmotes = async (
         if (sequenceNumberStartOfSearch === undefined) {
             emotes = await mysqlClient.query(
                 `SELECT * FROM wordlessdb.emote_table WHERE is_deleted = 0 ORDER BY emote_datetime DESC LIMIT ?`,
-                [numberOfCompletedAcquisitionsCompleted],
+                [Number(numberOfCompletedAcquisitionsCompleted)],
             );
         } else {
             emotes = await mysqlClient.query(
                 `SELECT * FROM wordlessdb.emote_table WHERE is_deleted = 0 AND emote_datetime <= (SELECT emote_datetime FROM wordlessdb.emote_table WHERE sequenceNumber = ? ORDER BY emote_datetime DESC LIMIT 1) ORDER BY emote_datetime DESC LIMIT ?`,
                 [
-                    sequenceNumberStartOfSearch,
-                    numberOfCompletedAcquisitionsCompleted,
+                    Number(sequenceNumberStartOfSearch),
+                    Number(numberOfCompletedAcquisitionsCompleted),
                 ],
             );
         }

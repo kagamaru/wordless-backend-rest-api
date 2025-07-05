@@ -256,7 +256,7 @@ describe("接続時", () => {
 
         expect(getRDSDBClientQueryMock).toHaveBeenCalledWith(
             "SELECT * FROM wordlessdb.emote_table WHERE is_deleted = 0 ORDER BY emote_datetime DESC LIMIT ?",
-            ["10"],
+            [10],
         );
         expect(getRDSDBClientQueryMock).toHaveBeenCalledTimes(1);
     });
@@ -279,7 +279,7 @@ describe("接続時", () => {
 
         expect(getRDSDBClientQueryMock).toHaveBeenCalledWith(
             "SELECT * FROM wordlessdb.emote_table WHERE is_deleted = 0 AND emote_datetime <= (SELECT emote_datetime FROM wordlessdb.emote_table WHERE sequenceNumber = ? ORDER BY emote_datetime DESC LIMIT 1) ORDER BY emote_datetime DESC LIMIT ?",
-            ["8", "10"],
+            [8, 10],
         );
         expect(getRDSDBClientQueryMock).toHaveBeenCalledTimes(1);
     });
