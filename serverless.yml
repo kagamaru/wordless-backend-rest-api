@@ -55,7 +55,7 @@ functions:
               - X-Api-Key
               - X-Requested-With
             methods:
-              - POST
+              - GET
               - OPTIONS
           authorizer:
             type: COGNITO_USER_POOLS
@@ -78,7 +78,7 @@ functions:
               - X-Api-Key
               - X-Requested-With
             methods:
-              - POST
+              - GET
               - OPTIONS
           authorizer:
             type: COGNITO_USER_POOLS
@@ -101,7 +101,7 @@ functions:
               - X-Api-Key
               - X-Requested-With
             methods:
-              - POST
+              - GET
               - OPTIONS
           authorizer:
             type: COGNITO_USER_POOLS
@@ -122,7 +122,6 @@ functions:
               - X-Requested-With
             methods:
               - GET
-              - POST
               - OPTIONS
           authorizer:
             type: COGNITO_USER_POOLS
