@@ -147,22 +147,22 @@ export const fetchEmotes = async (
         }
 
         response.push(
-            new Emote(
-                emote.sequence_number,
-                emote.emote_id,
-                userInfo.userName,
-                emote.user_id,
-                emote.emote_datetime,
-                emote.emote_reaction_id,
-                [
+            new Emote({
+                sequenceNumber: emote.sequence_number,
+                emoteId: emote.emote_id,
+                userName: userInfo.userName,
+                userId: emote.user_id,
+                emoteDatetime: emote.emote_datetime,
+                emoteReactionId: emote.emote_reaction_id,
+                emoteEmojis: [
                     { emojiId: emote.emote_emoji1 },
                     { emojiId: emote.emote_emoji2 },
                     { emojiId: emote.emote_emoji3 },
                     { emojiId: emote.emote_emoji4 },
                 ],
-                userInfo.userAvatarUrl,
-                emoteReaction?.emoteReactionEmojis,
-            ),
+                userAvatarUrl: userInfo.userAvatarUrl,
+                emoteReactionEmojis: emoteReaction?.emoteReactionEmojis,
+            }),
         );
     }
 
