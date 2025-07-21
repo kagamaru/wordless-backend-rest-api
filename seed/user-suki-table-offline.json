@@ -1,0 +1,10 @@
+[
+    {
+        "userId": "@hoge_hoge",
+        "userSuki": ["snake", "dog", ":arrived:", ":neko_meme_screaming_cat:"]
+    },
+    {
+        "userId": "@fuga_fuga",
+        "userSuki": []
+    }
+]
