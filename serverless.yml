@@ -27,6 +27,7 @@ provider:
     EMOTE_REACTION_TABLE: emote-reaction-table-${sls:stage}
     USERS_TABLE: users-table-${sls:stage}
     USER_SUB_TABLE: user-sub-table-${sls:stage}
+    USER_SUKI_TABLE: user-suki-table-${sls:stage}
     DEPLOY_ENV: ${sls:stage}
     DB_HOST: ${env:DB_HOST}
     DB_USER: ${env:DB_USER}
@@ -54,7 +55,7 @@ functions:
               - X-Api-Key
               - X-Requested-With
             methods:
-              - POST
+              - GET
               - OPTIONS
           authorizer:
             type: COGNITO_USER_POOLS
@@ -77,7 +78,7 @@ functions:
               - X-Api-Key
               - X-Requested-With
             methods:
-              - POST
+              - GET
               - OPTIONS
           authorizer:
             type: COGNITO_USER_POOLS
@@ -85,6 +86,26 @@ functions:
     vpc:
       securityGroupIds: ${self:custom.security-group-id.${sls:stage}}
       subnetIds: ${self:custom.vpc_subnet_id.${sls:stage}}
+  findUserSuki:
+    handler: app/userSuki/findUserSuki.findUserSuki
+    events:
+      - http:
+          path: userSuki/{userId}
+          method: get
+          cors: 
+            origin: ${env:FRONTEND_URL}
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Requested-With
+            methods:
+              - GET
+              - OPTIONS
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId: ${env:COGNITO_AUTHORIZER_ID}
   fetchEmotes:
     handler: app/emotes/fetchEmotes.fetchEmotes
     events:
@@ -101,7 +122,6 @@ functions:
               - X-Requested-With
             methods:
               - GET
-              - POST
               - OPTIONS
           authorizer:
             type: COGNITO_USER_POOLS
@@ -145,6 +165,17 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: user-sub-table-${sls:stage}
+    UserSukiTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: user-suki-table-${sls:stage}
     EmoteReactionTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -195,3 +226,5 @@ custom:
             sources: [./seed/emote-reaction-table-offline.json]
           - table: user-sub-table-offline
             sources: [./seed/user-sub-table-offline.json]
+          - table: user-suki-table-offline
+            sources: [./seed/user-suki-table-offline.json]
