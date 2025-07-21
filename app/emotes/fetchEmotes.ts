@@ -32,10 +32,8 @@ export const fetchEmotes = async (
     } = event.queryStringParameters;
 
     if (
-        !userId ||
         numberOfCompletedAcquisitionsCompleted === "0" ||
-        !numberOfCompletedAcquisitionsCompleted ||
-        userId.trim() === ""
+        !numberOfCompletedAcquisitionsCompleted
     ) {
         return createErrorResponse(
             400,
@@ -48,19 +46,37 @@ export const fetchEmotes = async (
 
     let emotes = new Array<FetchedEmote>();
     try {
-        if (sequenceNumberStartOfSearch === undefined) {
-            emotes = await mysqlClient.query(
-                `SELECT * FROM wordlessdb.emote_table WHERE is_deleted = 0 ORDER BY emote_datetime DESC LIMIT ?`,
-                [Number(numberOfCompletedAcquisitionsCompleted)],
-            );
+        if (userId) {
+            if (!sequenceNumberStartOfSearch) {
+                emotes = await mysqlClient.query(
+                    `SELECT * FROM wordlessdb.emote_table WHERE is_deleted = 0 AND user_id = ? ORDER BY emote_datetime DESC LIMIT ?`,
+                    [userId, Number(numberOfCompletedAcquisitionsCompleted)],
+                );
+            } else {
+                emotes = await mysqlClient.query(
+                    `SELECT * FROM wordlessdb.emote_table WHERE is_deleted = 0 AND user_id = ? AND emote_datetime < (SELECT emote_datetime FROM wordlessdb.emote_table WHERE sequence_number = ? ORDER BY emote_datetime DESC LIMIT 1) ORDER BY emote_datetime DESC LIMIT ?`,
+                    [
+                        userId,
+                        Number(sequenceNumberStartOfSearch),
+                        Number(numberOfCompletedAcquisitionsCompleted),
+                    ],
+                );
+            }
         } else {
-            emotes = await mysqlClient.query(
-                `SELECT * FROM wordlessdb.emote_table WHERE is_deleted = 0 AND emote_datetime <= (SELECT emote_datetime FROM wordlessdb.emote_table WHERE sequenceNumber = ? ORDER BY emote_datetime DESC LIMIT 1) ORDER BY emote_datetime DESC LIMIT ?`,
-                [
-                    Number(sequenceNumberStartOfSearch),
-                    Number(numberOfCompletedAcquisitionsCompleted),
-                ],
-            );
+            if (!sequenceNumberStartOfSearch) {
+                emotes = await mysqlClient.query(
+                    `SELECT * FROM wordlessdb.emote_table WHERE is_deleted = 0 ORDER BY emote_datetime DESC LIMIT ?`,
+                    [Number(numberOfCompletedAcquisitionsCompleted)],
+                );
+            } else {
+                emotes = await mysqlClient.query(
+                    `SELECT * FROM wordlessdb.emote_table WHERE is_deleted = 0 AND emote_datetime < (SELECT emote_datetime FROM wordlessdb.emote_table WHERE sequence_number = ? ORDER BY emote_datetime DESC LIMIT 1) ORDER BY emote_datetime DESC LIMIT ?`,
+                    [
+                        Number(sequenceNumberStartOfSearch),
+                        Number(numberOfCompletedAcquisitionsCompleted),
+                    ],
+                );
+            }
         }
     } catch (error) {
         return createErrorResponse(
