@@ -237,37 +237,37 @@ describe("接続時", () => {
             expect(response.body).toEqual(
                 JSON.stringify({
                     emotes: [
-                        new Emote(
-                            2,
-                            "emoteId-c",
-                            "A",
-                            "@a",
-                            "2022-01-19 09:00:48",
-                            "emoteReactionId-c",
-                            [
+                        new Emote({
+                            sequenceNumber: 2,
+                            emoteId: "emoteId-c",
+                            userName: "A",
+                            userId: "@a",
+                            emoteDatetime: "2022-01-19 09:00:48",
+                            emoteReactionId: "emoteReactionId-c",
+                            emoteEmojis: [
                                 { emojiId: ":smile:" },
                                 { emojiId: ":smile:" },
                                 { emojiId: ":smile:" },
                                 { emojiId: ":smile:" },
                             ],
-                            "https://image.test/a.png",
-                            [],
-                        ),
-                        new Emote(
-                            0,
-                            "emoteId-a",
-                            "A",
-                            "@a",
-                            "2025-01-18 09:00:48",
-                            "emoteReactionId-a",
-                            [
+                            userAvatarUrl: "https://image.test/a.png",
+                            emoteReactionEmojis: [],
+                        }),
+                        new Emote({
+                            sequenceNumber: 0,
+                            emoteId: "emoteId-a",
+                            userName: "A",
+                            userId: "@a",
+                            emoteDatetime: "2025-01-18 09:00:48",
+                            emoteReactionId: "emoteReactionId-a",
+                            emoteEmojis: [
                                 { emojiId: ":snake:" },
                                 { emojiId: ":smile:" },
                                 { emojiId: ":smile:" },
                                 { emojiId: ":party_parrot:" },
                             ],
-                            "https://image.test/a.png",
-                            [
+                            userAvatarUrl: "https://image.test/a.png",
+                            emoteReactionEmojis: [
                                 {
                                     emojiId: ":snake:",
                                     numberOfReactions: 2,
@@ -279,7 +279,7 @@ describe("接続時", () => {
                                     reactedUserIds: ["@a"],
                                 },
                             ],
-                        ),
+                        }),
                     ],
                 }),
             );
@@ -350,43 +350,43 @@ describe("接続時", () => {
             expect(response.body).toEqual(
                 JSON.stringify({
                     emotes: [
-                        new Emote(
-                            1,
-                            "emoteId-b",
-                            "B",
-                            "@b",
-                            "2025-01-19 09:00:48",
-                            "emoteReactionId-b",
-                            [
+                        new Emote({
+                            sequenceNumber: 1,
+                            emoteId: "emoteId-b",
+                            userName: "B",
+                            userId: "@b",
+                            emoteDatetime: "2025-01-19 09:00:48",
+                            emoteReactionId: "emoteReactionId-b",
+                            emoteEmojis: [
                                 { emojiId: ":bear:" },
                                 { emojiId: ":bear:" },
                                 { emojiId: ":sad:" },
                                 { emojiId: ":party_parrot:" },
                             ],
-                            "https://image.test/b.png",
-                            [
+                            userAvatarUrl: "https://image.test/b.png",
+                            emoteReactionEmojis: [
                                 {
                                     emojiId: ":party_parrot:",
                                     numberOfReactions: 2,
                                     reactedUserIds: ["@a", "@b"],
                                 },
                             ],
-                        ),
-                        new Emote(
-                            0,
-                            "emoteId-a",
-                            "A",
-                            "@a",
-                            "2025-01-18 09:00:48",
-                            "emoteReactionId-a",
-                            [
+                        }),
+                        new Emote({
+                            sequenceNumber: 0,
+                            emoteId: "emoteId-a",
+                            userName: "A",
+                            userId: "@a",
+                            emoteDatetime: "2025-01-18 09:00:48",
+                            emoteReactionId: "emoteReactionId-a",
+                            emoteEmojis: [
                                 { emojiId: ":snake:" },
                                 { emojiId: ":smile:" },
                                 { emojiId: ":smile:" },
                                 { emojiId: ":party_parrot:" },
                             ],
-                            "https://image.test/a.png",
-                            [
+                            userAvatarUrl: "https://image.test/a.png",
+                            emoteReactionEmojis: [
                                 {
                                     emojiId: ":snake:",
                                     numberOfReactions: 2,
@@ -398,7 +398,7 @@ describe("接続時", () => {
                                     reactedUserIds: ["@a"],
                                 },
                             ],
-                        ),
+                        }),
                     ],
                 }),
             );
