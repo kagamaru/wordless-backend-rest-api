@@ -69,7 +69,7 @@ const testSetUp = (setUpDB: {
     }
 };
 
-describe("GET /users/sub/:userSub", () => {
+describe("正常系", () => {
     test("正常時、userId, userName, userAvatarUrlを返す", async () => {
         testSetUp({ isUserDBSetup: "ok", isUserSubDBSetup: "ok" });
 
@@ -82,7 +82,9 @@ describe("GET /users/sub/:userSub", () => {
         expect(response.statusCode).toBe(200);
         expect(response.body).toEqual(JSON.stringify(userTableItem.Item));
     });
+});
 
+describe("異常系", () => {
     test("リクエストのpathParametersが無い時、USE-11と400エラーを返す", async () => {
         testSetUp({ isUserDBSetup: "ok", isUserSubDBSetup: "ok" });
 

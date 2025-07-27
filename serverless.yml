@@ -23,6 +23,7 @@ provider:
             - Fn::GetAtt: [UsersTable, Arn]
             - Fn::GetAtt: [EmoteReactionTable, Arn]
             - Fn::GetAtt: [UserSubTable, Arn]
+            - Fn::GetAtt: [UserSukiTable, Arn]
   environment:
     EMOTE_REACTION_TABLE: emote-reaction-table-${sls:stage}
     USERS_TABLE: users-table-${sls:stage}
@@ -60,9 +61,6 @@ functions:
           authorizer:
             type: COGNITO_USER_POOLS
             authorizerId: ${env:COGNITO_AUTHORIZER_ID}
-    vpc:
-      securityGroupIds: ${self:custom.security-group-id.${sls:stage}}
-      subnetIds: ${self:custom.vpc_subnet_id.${sls:stage}}
   findUserSub:
     handler: app/users/findUserSub.findUserSub
     events:
@@ -83,9 +81,6 @@ functions:
           authorizer:
             type: COGNITO_USER_POOLS
             authorizerId: ${env:COGNITO_AUTHORIZER_ID}
-    vpc:
-      securityGroupIds: ${self:custom.security-group-id.${sls:stage}}
-      subnetIds: ${self:custom.vpc_subnet_id.${sls:stage}}
   findUserSuki:
     handler: app/userSuki/findUserSuki.findUserSuki
     events:
@@ -111,6 +106,29 @@ functions:
     events:
       - http:
           path: emotes/
+          method: get
+          cors:
+            origin: ${env:FRONTEND_URL}
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Requested-With
+            methods:
+              - GET
+              - OPTIONS
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId: ${env:COGNITO_AUTHORIZER_ID}
+    vpc:
+      securityGroupIds: ${self:custom.security-group-id.${sls:stage}}
+      subnetIds: ${self:custom.vpc_subnet_id.${sls:stage}}
+  fetchFollow:
+    handler: app/follow/fetchFollow.fetchFollow
+    events:
+      - http:
+          path: follow/{userId}
           method: get
           cors:
             origin: ${env:FRONTEND_URL}
