@@ -210,7 +210,7 @@ beforeEach(() => {
     getRDSDBClientQueryMock = jest.fn().mockResolvedValue(emoteTableItem);
 });
 
-describe("接続時", () => {
+describe("正常系", () => {
     describe("userIdが指定されている時", () => {
         beforeEach(() => {
             getRDSDBClientQueryMock = jest

@@ -21,7 +21,7 @@ beforeEach(() => {
     ddbMock.reset();
 });
 
-describe("GET /users/:userId", () => {
+describe("正常系", () => {
     test("正常時、userId, userName, userAvatarUrlを返す", async () => {
         ddbMock.on(GetCommand).resolves(item);
 
@@ -34,7 +34,9 @@ describe("GET /users/:userId", () => {
         expect(response.statusCode).toBe(200);
         expect(response.body).toEqual(JSON.stringify(item.Item));
     });
+});
 
+describe("異常系", () => {
     test("リクエストのpathParametersが無い時、USE-01と400エラーを返す", async () => {
         ddbMock.on(GetCommand).resolves({ Item: null });
 
