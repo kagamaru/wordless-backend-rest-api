@@ -7,7 +7,7 @@ export const fetchFollow = async (
     event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
     const originName = event.headers.origin;
-    if (!event.queryStringParameters) {
+    if (!event.pathParameters) {
         return createErrorResponse(
             400,
             {
@@ -17,7 +17,7 @@ export const fetchFollow = async (
         );
     }
 
-    const { userId } = event.queryStringParameters;
+    const { userId } = event.pathParameters;
 
     if (!userId) {
         return createErrorResponse(
@@ -31,8 +31,8 @@ export const fetchFollow = async (
 
     // NOTE: 存在しないuserIdを指定したとしても、空配列が返却されるだけなので、userIdの実在性検査はしない
 
-    let followingArray: Array<string> = [];
-    let followeeArray: Array<string> = [];
+    let followingArray: Array<{ followee_id: string }> = [];
+    let followeeArray: Array<{ follower_id: string }> = [];
 
     try {
         followingArray = await mysqlClient.query(
@@ -58,9 +58,9 @@ export const fetchFollow = async (
     return createResponse(
         {
             totalNumberOfFollowing: followingArray.length,
-            followingUserIds: followingArray,
+            followingUserIds: followingArray.map((item) => item.followee_id),
             totalNumberOfFollowees: followeeArray.length,
-            followeeUserIds: followeeArray,
+            followeeUserIds: followeeArray.map((item) => item.follower_id),
         },
         originName,
     );

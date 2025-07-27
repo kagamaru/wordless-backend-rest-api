@@ -1,14 +1,15 @@
-import { mockClient } from "aws-sdk-client-mock";
-import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { getHandlerRequest } from "@/test/testutils/getHandlerRequest";
 import { fetchFollow } from "@/app/follow/fetchFollow";
 
-const ddbMock = mockClient(DynamoDBDocumentClient);
 let getRDSDBClientSelectFollowQueryMock: jest.Mock<any, any, any>;
 let getRDSDBClientSelectFolloweeQueryMock: jest.Mock<any, any, any>;
 
-const followersSelectedFromTable = ["@z"];
-const followeesSelectedFromTable = ["@b", "@c", "@z"];
+const followersSelectedFromTable = [{ followee_id: "@z" }];
+const followeesSelectedFromTable = [
+    { follower_id: "@b" },
+    { follower_id: "@c" },
+    { follower_id: "@z" },
+];
 
 jest.mock("@/config", () => ({
     envConfig: {
@@ -47,7 +48,6 @@ jest.mock("@/utility", () => {
 });
 
 beforeEach(() => {
-    ddbMock.reset();
     getRDSDBClientSelectFollowQueryMock = jest
         .fn()
         .mockResolvedValue(followersSelectedFromTable);
@@ -60,7 +60,7 @@ describe("正常系", () => {
     test("フォローしているユーザーと、フォローされているユーザーを取得する", async () => {
         const response = await fetchFollow(
             getHandlerRequest({
-                queryStringParameters: {
+                pathParameters: {
                     userId: "@a",
                 },
             }),
@@ -70,9 +70,9 @@ describe("正常系", () => {
         expect(response.body).toEqual(
             JSON.stringify({
                 totalNumberOfFollowing: followersSelectedFromTable.length,
-                followingUserIds: followersSelectedFromTable,
+                followingUserIds: ["@z"],
                 totalNumberOfFollowees: followeesSelectedFromTable.length,
-                followeeUserIds: followeesSelectedFromTable,
+                followeeUserIds: ["@b", "@c", "@z"],
             }),
         );
     });
@@ -80,7 +80,7 @@ describe("正常系", () => {
     test("フォローしているユーザーを取得するQueryが実行される", async () => {
         await fetchFollow(
             getHandlerRequest({
-                queryStringParameters: { userId: "@a" },
+                pathParameters: { userId: "@a" },
             }),
         );
 
@@ -93,7 +93,7 @@ describe("正常系", () => {
     test("フォローされているユーザーを取得するQueryが実行される", async () => {
         await fetchFollow(
             getHandlerRequest({
-                queryStringParameters: { userId: "@a" },
+                pathParameters: { userId: "@a" },
             }),
         );
 
@@ -109,7 +109,7 @@ describe("正常系", () => {
 
         const response = await fetchFollow(
             getHandlerRequest({
-                queryStringParameters: {
+                pathParameters: {
                     userId: "@a",
                 },
             }),
@@ -128,7 +128,7 @@ describe("正常系", () => {
 });
 
 describe("異常系", () => {
-    test("リクエストのqueryStringParametersが空の時、ステータスコード400とFOL-01を返す", async () => {
+    test("リクエストのpathParametersが空の時、ステータスコード400とFOL-01を返す", async () => {
         const response = await fetchFollow(getHandlerRequest({}));
 
         expect(response.statusCode).toBe(400);
@@ -142,7 +142,7 @@ describe("異常系", () => {
     test("リクエストのuserIdが無い時、ステータスコード400とFOL-02を返す", async () => {
         const response = await fetchFollow(
             getHandlerRequest({
-                queryStringParameters: {},
+                pathParameters: {},
             }),
         );
 
@@ -154,10 +154,10 @@ describe("異常系", () => {
         );
     });
 
-    test("リクエストのuserIdが空文字の時、ステータスコード500とFOL-02を返す", async () => {
+    test("リクエストのuserIdが空文字の時、ステータスコード400とFOL-02を返す", async () => {
         const response = await fetchFollow(
             getHandlerRequest({
-                queryStringParameters: {
+                pathParameters: {
                     userId: "",
                 },
             }),
@@ -178,7 +178,7 @@ describe("異常系", () => {
 
         const response = await fetchFollow(
             getHandlerRequest({
-                queryStringParameters: {
+                pathParameters: {
                     userId: "@a",
                 },
             }),
@@ -199,7 +199,7 @@ describe("異常系", () => {
 
         const response = await fetchFollow(
             getHandlerRequest({
-                queryStringParameters: {
+                pathParameters: {
                     userId: "@a",
                 },
             }),
