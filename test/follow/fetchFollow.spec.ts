@@ -1,9 +1,6 @@
-import { mockClient } from "aws-sdk-client-mock";
-import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { getHandlerRequest } from "@/test/testutils/getHandlerRequest";
 import { fetchFollow } from "@/app/follow/fetchFollow";
 
-const ddbMock = mockClient(DynamoDBDocumentClient);
 let getRDSDBClientSelectFollowQueryMock: jest.Mock<any, any, any>;
 let getRDSDBClientSelectFolloweeQueryMock: jest.Mock<any, any, any>;
 
@@ -51,7 +48,6 @@ jest.mock("@/utility", () => {
 });
 
 beforeEach(() => {
-    ddbMock.reset();
     getRDSDBClientSelectFollowQueryMock = jest
         .fn()
         .mockResolvedValue(followersSelectedFromTable);
@@ -158,7 +154,7 @@ describe("異常系", () => {
         );
     });
 
-    test("リクエストのuserIdが空文字の時、ステータスコード500とFOL-02を返す", async () => {
+    test("リクエストのuserIdが空文字の時、ステータスコード400とFOL-02を返す", async () => {
         const response = await fetchFollow(
             getHandlerRequest({
                 pathParameters: {
