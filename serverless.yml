@@ -124,6 +124,29 @@ functions:
     vpc:
       securityGroupIds: ${self:custom.security-group-id.${sls:stage}}
       subnetIds: ${self:custom.vpc_subnet_id.${sls:stage}}
+  fetchFollow:
+    handler: app/follow/fetchFollow.fetchFollow
+    events:
+      - http:
+          path: follow/{userId}
+          method: get
+          cors:
+            origin: ${env:FRONTEND_URL}
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Requested-With
+            methods:
+              - GET
+              - OPTIONS
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId: ${env:COGNITO_AUTHORIZER_ID}
+    vpc:
+      securityGroupIds: ${self:custom.security-group-id.${sls:stage}}
+      subnetIds: ${self:custom.vpc_subnet_id.${sls:stage}}
 
 resources:
   Conditions:
