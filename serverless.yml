@@ -101,6 +101,26 @@ functions:
           authorizer:
             type: COGNITO_USER_POOLS
             authorizerId: ${env:COGNITO_AUTHORIZER_ID}
+  postUserSuki:
+    handler: app/userSuki/postUserSuki.postUserSuki
+    events:
+      - http:
+          path: userSuki/{userId}
+          method: post
+          cors: 
+            origin: ${env:FRONTEND_URL}
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Requested-With
+            methods:
+              - POST
+              - OPTIONS
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId: ${env:COGNITO_AUTHORIZER_ID}
   fetchEmotes:
     handler: app/emotes/fetchEmotes.fetchEmotes
     events:
