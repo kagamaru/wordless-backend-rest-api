@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { createErrorResponse, getRDSDBClient } from "@/utility";
+import { createErrorResponse, createResponse, getRDSDBClient } from "@/utility";
 
 const mysqlClient = getRDSDBClient();
 
@@ -34,6 +34,7 @@ export const deleteEmote = async (
             `UPDATE wordlessdb.emote_table SET is_deleted = 1 WHERE emote_id = ?`,
             [emoteId],
         );
+        return createResponse({}, originName);
     } catch (error) {
         return createErrorResponse(
             500,

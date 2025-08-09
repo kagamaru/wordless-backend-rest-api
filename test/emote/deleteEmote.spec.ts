@@ -32,6 +32,18 @@ beforeEach(() => {
 });
 
 describe("正常系", () => {
+    test("200を返す", async () => {
+        const response = await deleteEmote(
+            getHandlerRequest({
+                pathParameters: {
+                    emoteId: "emoteId-a",
+                },
+            }),
+        );
+
+        expect(response.statusCode).toBe(200);
+    });
+
     test("emoteを削除する", async () => {
         await deleteEmote(
             getHandlerRequest({
