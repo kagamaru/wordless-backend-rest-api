@@ -19,11 +19,14 @@ provider:
             - dynamodb:PutItem
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
+            - s3:PutObject
+            - s3:GetObject            
           Resource:
             - Fn::GetAtt: [UsersTable, Arn]
             - Fn::GetAtt: [EmoteReactionTable, Arn]
             - Fn::GetAtt: [UserSubTable, Arn]
             - Fn::GetAtt: [UserSukiTable, Arn]
+            - Fn::GetAtt: [UserImageBucket, Arn]
   environment:
     EMOTE_REACTION_TABLE: emote-reaction-table-${sls:stage}
     USERS_TABLE: users-table-${sls:stage}
@@ -37,6 +40,9 @@ provider:
     FRONTEND_URL: ${self:custom.frontend-url.${sls:stage}}
     ALLOW_ORIGIN: ${self:custom.frontend-url.offline}
     COGNITO_AUTHORIZER_ID: ${env:COGNITO_AUTHORIZER_ID}
+    AWS_REGION: ${env:AWS_REGION}
+    USER_IMAGE_BUCKET: ${env:USER_IMAGE_BUCKET}
+    CLOUDFRONT_USER_IMAGE_URL: ${env:CLOUDFRONT_USER_IMAGE_URL}
   # 初回実行時はコメントアウトする
   apiName: wordless-backend-rest-api-${sls:stage}
 
@@ -236,6 +242,26 @@ functions:
     vpc:
       securityGroupIds: ${self:custom.security-group-id.${sls:stage}}
       subnetIds: ${self:custom.vpc_subnet_id.${sls:stage}}
+  postUserImageUploadUrl:
+    handler: app/userImage/postUserImageUploadUrl.postUserImageUploadUrl
+    events:
+      - http:
+          path: userImage/{userId}/uploadUrl
+          method: post
+          cors:
+            origin: ${env:FRONTEND_URL}
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Requested-With
+            methods:
+              - POST
+              - OPTIONS
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId: ${env:COGNITO_AUTHORIZER_ID}
 
 resources:
   Conditions:
@@ -294,6 +320,10 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: emote-reaction-table-${sls:stage}
+    UserImageBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${env:USER_IMAGE_BUCKET}
 
 plugins:
   - serverless-dynamodb

@@ -8,6 +8,9 @@ export const envConfig = {
     USER_SUKI_TABLE: process.env.USER_SUKI_TABLE,
     FRONTEND_URL: process.env.FRONTEND_URL,
     ALLOW_ORIGIN: process.env.ALLOW_ORIGIN,
+    USER_IMAGE_BUCKET: process.env.USER_IMAGE_BUCKET,
+    CLOUDFRONT_USER_IMAGE_URL: process.env.CLOUDFRONT_USER_IMAGE_URL,
+    AWS_REGION: process.env.AWS_REGION,
 };
 
 export const dbConfig = {
