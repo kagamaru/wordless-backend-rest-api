@@ -12,5 +12,9 @@ export const getDynamoDBClient = (): DynamoDBDocumentClient => {
             region: "us-west-2",
         });
     }
-    return DynamoDBDocumentClient.from(client);
+    return DynamoDBDocumentClient.from(client, {
+        marshallOptions: {
+            removeUndefinedValues: true,
+        },
+    });
 };
