@@ -26,7 +26,7 @@ provider:
             - Fn::GetAtt: [EmoteReactionTable, Arn]
             - Fn::GetAtt: [UserSubTable, Arn]
             - Fn::GetAtt: [UserSukiTable, Arn]
-            - Fn::GetAtt: [UserImageBucket, Arn]
+            - arn:aws:s3:::wordless-assets-${sls:stage}/*
   environment:
     EMOTE_REACTION_TABLE: emote-reaction-table-${sls:stage}
     USERS_TABLE: users-table-${sls:stage}
@@ -40,7 +40,7 @@ provider:
     FRONTEND_URL: ${self:custom.frontend-url.${sls:stage}}
     ALLOW_ORIGIN: ${self:custom.frontend-url.offline}
     COGNITO_AUTHORIZER_ID: ${env:COGNITO_AUTHORIZER_ID}
-    AWS_REGION: ${env:AWS_REGION}
+    MY_AWS_REGION: ${env:MY_AWS_REGION}
     USER_IMAGE_BUCKET: ${env:USER_IMAGE_BUCKET}
     CLOUDFRONT_USER_IMAGE_URL: ${env:CLOUDFRONT_USER_IMAGE_URL}
   # 初回実行時はコメントアウトする
@@ -320,10 +320,6 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: emote-reaction-table-${sls:stage}
-    UserImageBucket:
-      Type: AWS::S3::Bucket
-      Properties:
-        BucketName: ${env:USER_IMAGE_BUCKET}
 
 plugins:
   - serverless-dynamodb

@@ -1,17 +1,22 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import dayjs from "dayjs";
+import "dayjs/locale/ja";
 import { envConfig } from "@/config";
 import { BLACKLISTED } from "@/static/blackListIds";
 import {
     createErrorResponse,
     createResponse,
+    getItemFromDynamoDB,
     getS3Client,
     putToDynamoDB,
 } from "@/utility";
 
 const s3Client = getS3Client();
 const MAX_BYTES = 5 * 1024 * 1024; // 5MB
+
+dayjs.locale("ja");
 
 type PostUserImageRequestBody = {
     contentType: string;
@@ -56,10 +61,11 @@ export const postUserImageUploadUrl = async (
     }
 
     const key = userId;
+    const timestamp = dayjs().format("YYYYMMDDHHmmss");
 
     const putCmd = new PutObjectCommand({
         Bucket: bucket,
-        Key: `/userProfile/${key}`,
+        Key: `userProfile/${key}_${timestamp}`,
         ContentType: contentType,
         // NOTE: no-cache は キャッシュが有効期限内であっても、毎回キャッシュが最新か判断する
         // NOTE: no-store は キャッシュを保存しない
@@ -75,15 +81,41 @@ export const postUserImageUploadUrl = async (
         return createErrorResponse(500, { error: "IMG-06" }, originName);
     }
 
-    const publicUrl = `${envConfig.CLOUDFRONT_USER_IMAGE_URL}/userProfile/${encodeURIComponent(key)}`;
+    const publicUrl = `${envConfig.CLOUDFRONT_USER_IMAGE_URL}/userProfile/${encodeURIComponent(key)}_${timestamp}`;
+
+    let fetchedUserName: string;
+    try {
+        const { userName } = await getItemFromDynamoDB(envConfig.USERS_TABLE, {
+            userId,
+        });
+        fetchedUserName = userName as string;
+    } catch (error) {
+        if (error.message === "Cannot find item") {
+            return createErrorResponse(
+                404,
+                {
+                    error: "IMG-07",
+                },
+                originName,
+            );
+        }
+        return createErrorResponse(
+            500,
+            {
+                error: "IMG-08",
+            },
+            originName,
+        );
+    }
 
     try {
         await putToDynamoDB(envConfig.USERS_TABLE, {
             userId,
             userAvatarUrl: publicUrl,
+            userName: fetchedUserName,
         });
     } catch (error) {
-        return createErrorResponse(500, { error: "IMG-07" }, originName);
+        return createErrorResponse(500, { error: "IMG-09" }, originName);
     }
 
     return createResponse(
