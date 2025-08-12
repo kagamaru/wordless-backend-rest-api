@@ -10,7 +10,7 @@ export const envConfig = {
     ALLOW_ORIGIN: process.env.ALLOW_ORIGIN,
     USER_IMAGE_BUCKET: process.env.USER_IMAGE_BUCKET,
     CLOUDFRONT_USER_IMAGE_URL: process.env.CLOUDFRONT_USER_IMAGE_URL,
-    AWS_REGION: process.env.AWS_REGION,
+    MY_AWS_REGION: process.env.MY_AWS_REGION,
 };
 
 export const dbConfig = {
