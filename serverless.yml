@@ -26,7 +26,7 @@ provider:
             - Fn::GetAtt: [EmoteReactionTable, Arn]
             - Fn::GetAtt: [UserSubTable, Arn]
             - Fn::GetAtt: [UserSukiTable, Arn]
-            - arn:aws:s3:::wordless-assets-${sls:stage}/*
+            - arn:aws:s3:::${env:USER_IMAGE_BUCKET}/*
   environment:
     EMOTE_REACTION_TABLE: emote-reaction-table-${sls:stage}
     USERS_TABLE: users-table-${sls:stage}
