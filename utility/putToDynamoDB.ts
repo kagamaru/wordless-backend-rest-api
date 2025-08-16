@@ -1,5 +1,4 @@
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
-import { ErrorCode } from "@/@types";
 import { getDynamoDBClient } from "@/utility/getDynamoDBClient";
 
 const docClient = getDynamoDBClient();
