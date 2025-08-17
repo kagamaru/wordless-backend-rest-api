@@ -5,6 +5,7 @@ import {
     createErrorResponse,
     createResponse,
     getItemFromDynamoDB,
+    invokeTokenValidator,
     putToDynamoDB,
     verifyUserName,
 } from "@/utility";
@@ -39,6 +40,14 @@ export const postUserName = async (
             },
             originName,
         );
+    }
+
+    const result = await invokeTokenValidator(
+        event.headers.Authorization,
+        userId,
+    );
+    if (result === "invalid") {
+        return createErrorResponse(401, { error: "AUN-99" }, originName);
     }
 
     let userItem: User;

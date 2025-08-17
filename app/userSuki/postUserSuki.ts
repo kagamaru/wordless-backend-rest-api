@@ -4,6 +4,7 @@ import {
     createErrorResponse,
     createResponse,
     getItemFromDynamoDB,
+    invokeTokenValidator,
     putToDynamoDB,
 } from "@/utility";
 import { PostUserSukiPayload } from "@/@types";
@@ -24,6 +25,14 @@ export const postUserSuki = async (
     }
 
     const pathParameterUserId = event.pathParameters.userId;
+    const result = await invokeTokenValidator(
+        event.headers.Authorization,
+        pathParameterUserId,
+    );
+    if (result === "invalid") {
+        return createErrorResponse(401, { error: "AUN-99" }, originName);
+    }
+
     let body: PostUserSukiPayload;
     try {
         body = JSON.parse(event.body) as PostUserSukiPayload;

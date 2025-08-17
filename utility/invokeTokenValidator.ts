@@ -7,7 +7,7 @@ export const invokeTokenValidator = async (
     userId: string,
 ): Promise<"valid" | "invalid"> => {
     const lambdaClient = new LambdaClient({
-        region: "us-west-2",
+        region: envConfig.MY_AWS_REGION,
     });
     const invokeCommand = new InvokeCommand({
         FunctionName: envConfig.TOKEN_VALIDATOR_LAMBDA_NAME,

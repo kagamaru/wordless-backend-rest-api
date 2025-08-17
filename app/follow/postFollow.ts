@@ -4,6 +4,7 @@ import {
     createErrorResponse,
     getRDSDBClient,
     getItemFromDynamoDB,
+    invokeTokenValidator,
 } from "@/utility";
 import { envConfig } from "@/config";
 
@@ -43,6 +44,14 @@ export const postFollow = async (
     }
 
     const { followerId } = JSON.parse(event.body);
+    const result = await invokeTokenValidator(
+        event.headers.Authorization,
+        followerId,
+    );
+    if (result === "invalid") {
+        return createErrorResponse(401, { error: "AUN-99" }, originName);
+    }
+
     const { userId } = event.pathParameters;
     const followeeId = userId;
 
