@@ -20,13 +20,15 @@ provider:
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
             - s3:PutObject
-            - s3:GetObject            
+            - s3:GetObject
+            - lambda:InvokeFunction            
           Resource:
             - Fn::GetAtt: [UsersTable, Arn]
             - Fn::GetAtt: [EmoteReactionTable, Arn]
             - Fn::GetAtt: [UserSubTable, Arn]
             - Fn::GetAtt: [UserSukiTable, Arn]
             - arn:aws:s3:::${env:USER_IMAGE_BUCKET}/*
+            - arn:aws:lambda:${env:MY_AWS_REGION}:${aws:accountId}:function:${env:TOKEN_VALIDATOR_LAMBDA_NAME}
   environment:
     EMOTE_REACTION_TABLE: emote-reaction-table-${sls:stage}
     USERS_TABLE: users-table-${sls:stage}
@@ -43,10 +45,15 @@ provider:
     MY_AWS_REGION: ${env:MY_AWS_REGION}
     USER_IMAGE_BUCKET: ${env:USER_IMAGE_BUCKET}
     CLOUDFRONT_USER_IMAGE_URL: ${env:CLOUDFRONT_USER_IMAGE_URL}
+    COGNITO_USER_POOL_ID: ${env:COGNITO_USER_POOL_ID}
+    COGNITO_CLIENT_ID: ${env:COGNITO_CLIENT_ID}
+    TOKEN_VALIDATOR_LAMBDA_NAME: ${env:TOKEN_VALIDATOR_LAMBDA_NAME}
   # 初回実行時はコメントアウトする
   apiName: wordless-backend-rest-api-${sls:stage}
 
 functions:
+  verifyToken:
+    handler: app/auth/verifyToken.verifyToken
   getUserHandler:
     handler: app/users/findUser.findUser
     events:
