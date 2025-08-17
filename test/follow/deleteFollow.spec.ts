@@ -24,10 +24,13 @@ jest.mock("@/config", () => ({
         DB_NAME: "",
     },
 }));
+
+let invokeTokenValidatorMock = jest.fn();
 jest.mock("@/utility", () => {
     const actual = jest.requireActual("@/utility");
     return {
         ...actual,
+        invokeTokenValidator: () => invokeTokenValidatorMock(),
         getRDSDBClient: jest.fn(() => ({
             query: (sql: string, params: any[]) => {
                 if (sql.includes("DELETE FROM wordlessdb.follow_table")) {
@@ -52,6 +55,7 @@ jest.mock("@/utility", () => {
 });
 
 beforeEach(() => {
+    invokeTokenValidatorMock = jest.fn(() => "valid");
     deleteFollowQueryMock = jest.fn().mockResolvedValue([]);
     selectFollowQueryMock = jest
         .fn()
@@ -209,6 +213,28 @@ describe("異常系", () => {
         expect(response.body).toEqual(
             JSON.stringify({
                 error: "FOL-31",
+            }),
+        );
+    });
+
+    test("トークンの検証に失敗した時、AUN-99と401エラーを返す", async () => {
+        invokeTokenValidatorMock = jest.fn(() => "invalid");
+
+        const response = await deleteFollow(
+            getHandlerRequest({
+                pathParameters: {
+                    userId: "@y",
+                },
+                body: JSON.stringify({
+                    followerId: "@a",
+                }),
+            }),
+        );
+
+        expect(response.statusCode).toBe(401);
+        expect(response.body).toEqual(
+            JSON.stringify({
+                error: "AUN-99",
             }),
         );
     });
