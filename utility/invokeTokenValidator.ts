@@ -1,14 +1,13 @@
-import { InvokeCommand, LambdaClient } from "@aws-sdk/client-lambda";
+import { InvokeCommand } from "@aws-sdk/client-lambda";
 import { Uint8ArrayBlobAdapter } from "@aws-sdk/util-stream";
 import { envConfig } from "@/config";
+import { getLambdaClient } from "@/utility";
 
 export const invokeTokenValidator = async (
     authHeader: string,
     userId: string,
 ): Promise<"valid" | "invalid"> => {
-    const lambdaClient = new LambdaClient({
-        region: envConfig.MY_AWS_REGION,
-    });
+    const lambdaClient = getLambdaClient();
     const invokeCommand = new InvokeCommand({
         FunctionName: envConfig.TOKEN_VALIDATOR_LAMBDA_NAME,
         InvocationType: "RequestResponse",
@@ -19,6 +18,7 @@ export const invokeTokenValidator = async (
     try {
         payload = (await lambdaClient.send(invokeCommand)).Payload;
     } catch (error) {
+        console.error(error);
         return "invalid";
     }
 
