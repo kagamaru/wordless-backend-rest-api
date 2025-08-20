@@ -15,6 +15,7 @@ export const envConfig = {
     COGNITO_CLIENT_ID: process.env.COGNITO_CLIENT_ID,
     TOKEN_VALIDATOR_LAMBDA_NAME: process.env.TOKEN_VALIDATOR_LAMBDA_NAME,
     POST_FOLLOW_LAMBDA_NAME: process.env.POST_FOLLOW_LAMBDA_NAME,
+    DELETE_FOLLOW_LAMBDA_NAME: process.env.DELETE_FOLLOW_LAMBDA_NAME,
 };
 
 export const dbConfig = {

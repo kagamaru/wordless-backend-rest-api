@@ -1,14 +1,14 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { FollowCoreResponse as DeleteFollowCoreResponse } from "@/@types";
+import { envConfig } from "@/config";
 import {
-    createResponse,
     createErrorResponse,
-    getRDSDBClient,
     invokeTokenValidator,
+    invokeLambda,
+    createResponse,
 } from "@/utility";
 
-const mysqlClient = getRDSDBClient();
-
-export const deleteFollow = async (
+export const deleteFollowEntry = async (
     event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
     const originName = event.headers.origin;
@@ -47,36 +47,12 @@ export const deleteFollow = async (
 
     // NOTE: 存在しないIDを指定したとしても、効果がないクエリが実行されるだけのため、ユーザーの実在性確認はしない
 
-    let followingArray: Array<{ followee_id: string }> = [];
-    let followeeArray: Array<{ follower_id: string }> = [];
+    const deleteFollowResult = await invokeLambda<DeleteFollowCoreResponse>(
+        envConfig.DELETE_FOLLOW_LAMBDA_NAME,
+        JSON.stringify({ followerId, followeeId }),
+    );
 
-    try {
-        await mysqlClient.query(
-            `DELETE FROM wordlessdb.follow_table WHERE follower_id = ? AND followee_id = ?`,
-            [followerId, followeeId],
-        );
-
-        followingArray = await mysqlClient.query(
-            `SELECT followee_id FROM wordlessdb.follow_table WHERE follower_id = ?`,
-            [followeeId],
-        );
-        followeeArray = await mysqlClient.query(
-            `SELECT follower_id FROM wordlessdb.follow_table WHERE followee_id = ?`,
-            [followeeId],
-        );
-
-        return createResponse(
-            {
-                totalNumberOfFollowing: followingArray.length,
-                followingUserIds: followingArray.map(
-                    (item) => item.followee_id,
-                ),
-                totalNumberOfFollowees: followeeArray.length,
-                followeeUserIds: followeeArray.map((item) => item.follower_id),
-            },
-            originName,
-        );
-    } catch (error) {
+    if (deleteFollowResult === "lambdaInvokeError") {
         return createErrorResponse(
             500,
             {
@@ -84,7 +60,7 @@ export const deleteFollow = async (
             },
             originName,
         );
-    } finally {
-        await mysqlClient.end();
     }
+
+    return createResponse(deleteFollowResult, originName);
 };

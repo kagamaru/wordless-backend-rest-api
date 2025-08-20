@@ -30,6 +30,7 @@ provider:
             - arn:aws:s3:::${env:USER_IMAGE_BUCKET}/*
             - arn:aws:lambda:${env:MY_AWS_REGION}:${aws:accountId}:function:${env:TOKEN_VALIDATOR_LAMBDA_NAME}
             - arn:aws:lambda:${env:MY_AWS_REGION}:${aws:accountId}:function:${env:POST_FOLLOW_LAMBDA_NAME}
+            - arn:aws:lambda:${env:MY_AWS_REGION}:${aws:accountId}:function:${env:DELETE_FOLLOW_LAMBDA_NAME}
   environment:
     EMOTE_REACTION_TABLE: emote-reaction-table-${sls:stage}
     USERS_TABLE: users-table-${sls:stage}
@@ -50,6 +51,7 @@ provider:
     COGNITO_CLIENT_ID: ${env:COGNITO_CLIENT_ID}
     TOKEN_VALIDATOR_LAMBDA_NAME: ${env:TOKEN_VALIDATOR_LAMBDA_NAME}
     POST_FOLLOW_LAMBDA_NAME: ${env:POST_FOLLOW_LAMBDA_NAME}
+    DELETE_FOLLOW_LAMBDA_NAME: ${env:DELETE_FOLLOW_LAMBDA_NAME}
   # 初回実行時はコメントアウトする
   apiName: wordless-backend-rest-api-${sls:stage}
 
@@ -250,8 +252,8 @@ functions:
     vpc:
       securityGroupIds: ${self:custom.security-group-id.${sls:stage}}
       subnetIds: ${self:custom.vpc_subnet_id.${sls:stage}}
-  deleteFollow:
-    handler: app/follow/deleteFollow.deleteFollow
+  deleteFollowEntry:
+    handler: app/follow/delete/deleteFollowEntry.deleteFollowEntry
     events:
       - http:
           path: follow/{userId}
@@ -270,6 +272,8 @@ functions:
           authorizer:
             type: COGNITO_USER_POOLS
             authorizerId: ${env:COGNITO_AUTHORIZER_ID}
+  deleteFollowCore:
+    handler: app/follow/delete/deleteFollowCore.deleteFollowCore
     vpc:
       securityGroupIds: ${self:custom.security-group-id.${sls:stage}}
       subnetIds: ${self:custom.vpc_subnet_id.${sls:stage}}
