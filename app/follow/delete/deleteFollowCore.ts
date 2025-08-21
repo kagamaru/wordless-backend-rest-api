@@ -37,6 +37,7 @@ export const deleteFollowCore = async ({
             followeeUserIds: followeeArray.map((item) => item.follower_id),
         };
     } catch (error) {
+        console.error(error);
         return "lambdaError";
     } finally {
         await mysqlClient.end();

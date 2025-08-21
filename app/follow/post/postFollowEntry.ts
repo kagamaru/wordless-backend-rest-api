@@ -81,7 +81,7 @@ export const postFollowEntry = async (
 
     const postFollowResult = await invokeLambda<PostFollowCoreResponse>(
         envConfig.POST_FOLLOW_LAMBDA_NAME,
-        JSON.stringify({ followerId, followeeId }),
+        { followerId, followeeId },
     );
 
     if (postFollowResult === "lambdaInvokeError") {

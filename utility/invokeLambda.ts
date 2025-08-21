@@ -3,13 +3,13 @@ import { getLambdaClient } from "@/utility";
 
 export const invokeLambda = async <T>(
     functionName: string,
-    payload: string,
+    payload: Record<string, any>,
 ): Promise<T | "lambdaInvokeError"> => {
     const lambdaClient = getLambdaClient();
     const invokeCommand = new InvokeCommand({
         FunctionName: functionName,
         InvocationType: "RequestResponse",
-        Payload: payload,
+        Payload: JSON.stringify(payload),
     });
 
     try {

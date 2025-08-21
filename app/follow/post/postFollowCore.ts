@@ -10,23 +10,22 @@ export const postFollowCore = async ({
     followerId,
     followeeId,
 }: PostFollowCorePayload): Promise<PostFollowCoreResponse | "lambdaError"> => {
-    let followingArray: Array<{ followee_id: string }> = [];
-    let followeeArray: Array<{ follower_id: string }> = [];
-
     try {
         await mysqlClient.query(
             `INSERT INTO wordlessdb.follow_table (follower_id, followee_id) VALUES (?, ?)`,
             [followerId, followeeId],
         );
 
-        followingArray = await mysqlClient.query(
-            `SELECT followee_id FROM wordlessdb.follow_table WHERE follower_id = ?`,
-            [followeeId],
-        );
-        followeeArray = await mysqlClient.query(
-            `SELECT follower_id FROM wordlessdb.follow_table WHERE followee_id = ?`,
-            [followeeId],
-        );
+        const [followingArray, followeeArray] = (await Promise.all([
+            mysqlClient.query(
+                `SELECT followee_id FROM wordlessdb.follow_table WHERE follower_id = ?`,
+                [followeeId],
+            ),
+            mysqlClient.query(
+                `SELECT follower_id FROM wordlessdb.follow_table WHERE followee_id = ?`,
+                [followeeId],
+            ),
+        ])) as [Array<{ followee_id: string }>, Array<{ follower_id: string }>];
 
         return {
             totalNumberOfFollowing: followingArray.length,

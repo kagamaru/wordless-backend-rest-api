@@ -6,10 +6,12 @@ const ddbMock = mockClient(DynamoDBDocumentClient);
 
 const userSubTableName = "user-sub-table-offline";
 
+const userSub = "userSub";
+const userId = "@fuga_fuga";
 const userSubTableItem = {
     Item: {
-        userSub: "userSub",
-        userId: "@fuga_fuga",
+        userSub,
+        userId,
     },
 };
 
@@ -62,7 +64,7 @@ describe("正常系", () => {
 
         const response = await verifyToken({
             authHeader: "Bearer token",
-            userId: "@fuga_fuga",
+            userId,
         });
 
         expect(response).toBe("valid");
@@ -75,7 +77,7 @@ describe("異常系", () => {
 
         const response = await verifyToken({
             authHeader: undefined,
-            userId: "@fuga_fuga",
+            userId,
         });
 
         expect(response).toBe("invalid");
@@ -87,7 +89,7 @@ describe("異常系", () => {
 
         const response = await verifyToken({
             authHeader: "Bearer invalidtoken",
-            userId: "@fuga_fuga",
+            userId,
         });
 
         expect(response).toBe("invalid");
@@ -109,7 +111,7 @@ describe("異常系", () => {
 
         const response = await verifyToken({
             authHeader: "Bearer token",
-            userId: "@fuga_fuga",
+            userId,
         });
 
         expect(response).toBe("invalid");

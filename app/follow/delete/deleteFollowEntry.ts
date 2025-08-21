@@ -49,7 +49,7 @@ export const deleteFollowEntry = async (
 
     const deleteFollowResult = await invokeLambda<DeleteFollowCoreResponse>(
         envConfig.DELETE_FOLLOW_LAMBDA_NAME,
-        JSON.stringify({ followerId, followeeId }),
+        { followerId, followeeId },
     );
 
     if (deleteFollowResult === "lambdaInvokeError") {
