@@ -19,10 +19,13 @@ jest.mock("@/config", () => ({
         CLOUDFRONT_USER_IMAGE_URL: "https://access-url.test",
     },
 }));
+
+let invokeTokenValidatorMock = jest.fn();
 jest.mock("@/utility", () => {
     const actual = jest.requireActual("@/utility");
     return {
         ...actual,
+        invokeTokenValidator: () => invokeTokenValidatorMock(),
     };
 });
 jest.mock("@aws-sdk/s3-request-presigner", () => {
@@ -72,6 +75,7 @@ const testSetUp = (setUp: {
 
 beforeEach(() => {
     ddbMock.reset();
+    invokeTokenValidatorMock = jest.fn(() => "valid");
     getSignedUrlMock = jest
         .fn()
         .mockResolvedValue(
@@ -230,6 +234,27 @@ describe("異常系", () => {
             );
         },
     );
+
+    test("トークンの検証に失敗した時、AUN-99と401エラーを返す", async () => {
+        invokeTokenValidatorMock = jest.fn(() => "invalid");
+
+        const response = await postUserImageUploadUrl(
+            getHandlerRequest({
+                pathParameters: { userId: "@a" },
+                body: JSON.stringify({
+                    contentType: "image/png",
+                    contentLength: 100,
+                }),
+            }),
+        );
+
+        expect(response.statusCode).toBe(401);
+        expect(response.body).toEqual(
+            JSON.stringify({
+                error: "AUN-99",
+            }),
+        );
+    });
 
     test("リクエストボディのJSON変換に失敗した時、ステータスコード400とIMG-03を返す", async () => {
         testSetUp({

@@ -16,6 +16,15 @@ jest.mock("@/config", () => ({
     },
 }));
 
+let invokeTokenValidatorMock = jest.fn();
+jest.mock("@/utility", () => {
+    const actual = jest.requireActual("@/utility");
+    return {
+        ...actual,
+        invokeTokenValidator: () => invokeTokenValidatorMock(),
+    };
+});
+
 const testSetUp = (setUp: {
     isUserDBFetchSetup: "found" | "notFound" | "fail";
     isUserDBPostSetup: "ok" | "fail";
@@ -55,6 +64,7 @@ const testSetUp = (setUp: {
 
 beforeEach(() => {
     ddbMock.reset();
+    invokeTokenValidatorMock = jest.fn(() => "valid");
 });
 
 describe("正常系", () => {
@@ -199,6 +209,26 @@ describe("異常系", () => {
             );
         },
     );
+
+    test("トークンの検証に失敗した時、AUN-99と401エラーを返す", async () => {
+        invokeTokenValidatorMock = jest.fn(() => "invalid");
+
+        const response = await postUserName(
+            getHandlerRequest({
+                pathParameters: { userId: "@a" },
+                body: JSON.stringify({
+                    userName: "test-user",
+                }),
+            }),
+        );
+
+        expect(response.statusCode).toBe(401);
+        expect(response.body).toEqual(
+            JSON.stringify({
+                error: "AUN-99",
+            }),
+        );
+    });
 
     test("存在しないuserIdでアクセスしたとき、USE-23と404エラーを返す", async () => {
         testSetUp({

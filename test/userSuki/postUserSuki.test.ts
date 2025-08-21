@@ -26,6 +26,15 @@ jest.mock("@/config", () => ({
     },
 }));
 
+let invokeTokenValidatorMock = jest.fn();
+jest.mock("@/utility", () => {
+    const actual = jest.requireActual("@/utility");
+    return {
+        ...actual,
+        invokeTokenValidator: () => invokeTokenValidatorMock(),
+    };
+});
+
 const testSetUp = (setUpDB: {
     isUsersDBGetSetup: "ok" | "notfound" | "fail";
     isUserSukiDBPostSetup: "ok" | "fail";
@@ -86,6 +95,7 @@ const testSetUp = (setUpDB: {
 
 beforeEach(() => {
     ddbMock.reset();
+    invokeTokenValidatorMock = jest.fn(() => "valid");
 });
 
 describe("正常系", () => {
@@ -293,6 +303,34 @@ describe("異常系", () => {
             );
         },
     );
+
+    test("トークンの検証に失敗した時、AUN-99と401エラーを返す", async () => {
+        invokeTokenValidatorMock = jest.fn(() => "invalid");
+        testSetUp({
+            isUsersDBGetSetup: "ok",
+            isUserSukiDBPostSetup: "ok",
+            isUserSukiDBGetSetup: "ok",
+        });
+
+        const response = await postUserSuki(
+            getHandlerRequest({
+                pathParameters: { userId: "@fuga_fuga" },
+                body: JSON.stringify({
+                    userSukiEmoji1: ":rat:",
+                    userSukiEmoji2: ":cow:",
+                    userSukiEmoji3: ":tiger:",
+                    userSukiEmoji4: ":rabbit:",
+                }),
+            }),
+        );
+
+        expect(response.statusCode).toBe(401);
+        expect(response.body).toEqual(
+            JSON.stringify({
+                error: "AUN-99",
+            }),
+        );
+    });
 
     test("指定されたuserIdに該当するユーザーが存在しない時、USK-12と404エラーを返す", async () => {
         testSetUp({

@@ -10,6 +10,7 @@ import {
     createResponse,
     getItemFromDynamoDB,
     getS3Client,
+    invokeTokenValidator,
     putToDynamoDB,
 } from "@/utility";
 
@@ -36,6 +37,14 @@ export const postUserImageUploadUrl = async (
     const userId = event.pathParameters.userId;
     if (BLACKLISTED.has(userId)) {
         return createErrorResponse(400, { error: "IMG-02" }, originName);
+    }
+
+    const result = await invokeTokenValidator(
+        event.headers.Authorization,
+        userId,
+    );
+    if (result === "invalid") {
+        return createErrorResponse(401, { error: "AUN-99" }, originName);
     }
 
     let body: PostUserImageRequestBody;

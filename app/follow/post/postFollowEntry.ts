@@ -1,13 +1,13 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { FollowCoreResponse as PostFollowCoreResponse } from "@/@types";
+import { envConfig } from "@/config";
 import {
     createResponse,
     createErrorResponse,
-    getRDSDBClient,
     getItemFromDynamoDB,
+    invokeTokenValidator,
+    invokeLambda,
 } from "@/utility";
-import { envConfig } from "@/config";
-
-const mysqlClient = getRDSDBClient();
 
 const handleDynamoDBError = (error: Error, originName: string) => {
     if (error.message === "Cannot find item") {
@@ -28,7 +28,7 @@ const handleDynamoDBError = (error: Error, originName: string) => {
     );
 };
 
-export const postFollow = async (
+export const postFollowEntry = async (
     event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
     const originName = event.headers.origin;
@@ -43,6 +43,14 @@ export const postFollow = async (
     }
 
     const { followerId } = JSON.parse(event.body);
+    const result = await invokeTokenValidator(
+        event.headers.Authorization,
+        followerId,
+    );
+    if (result === "invalid") {
+        return createErrorResponse(401, { error: "AUN-99" }, originName);
+    }
+
     const { userId } = event.pathParameters;
     const followeeId = userId;
 
@@ -71,36 +79,12 @@ export const postFollow = async (
         }
     }
 
-    let followingArray: Array<{ followee_id: string }> = [];
-    let followeeArray: Array<{ follower_id: string }> = [];
+    const postFollowResult = await invokeLambda<PostFollowCoreResponse>(
+        envConfig.POST_FOLLOW_LAMBDA_NAME,
+        { followerId, followeeId },
+    );
 
-    try {
-        await mysqlClient.query(
-            `INSERT INTO wordlessdb.follow_table (follower_id, followee_id) VALUES (?, ?)`,
-            [followerId, followeeId],
-        );
-
-        followingArray = await mysqlClient.query(
-            `SELECT followee_id FROM wordlessdb.follow_table WHERE follower_id = ?`,
-            [followeeId],
-        );
-        followeeArray = await mysqlClient.query(
-            `SELECT follower_id FROM wordlessdb.follow_table WHERE followee_id = ?`,
-            [followeeId],
-        );
-
-        return createResponse(
-            {
-                totalNumberOfFollowing: followingArray.length,
-                followingUserIds: followingArray.map(
-                    (item) => item.followee_id,
-                ),
-                totalNumberOfFollowees: followeeArray.length,
-                followeeUserIds: followeeArray.map((item) => item.follower_id),
-            },
-            originName,
-        );
-    } catch (error) {
+    if (postFollowResult === "lambdaInvokeError") {
         return createErrorResponse(
             500,
             {
@@ -108,7 +92,7 @@ export const postFollow = async (
             },
             originName,
         );
-    } finally {
-        await mysqlClient.end();
     }
+
+    return createResponse(postFollowResult, originName);
 };

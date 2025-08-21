@@ -1,59 +1,30 @@
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { mockClient } from "aws-sdk-client-mock";
 import { getHandlerRequest } from "@/test/testutils/getHandlerRequest";
-import { postFollow } from "@/app/follow/postFollow";
+import { postFollowEntry } from "@/app/follow/post/postFollowEntry";
 
 const ddbMock = mockClient(DynamoDBDocumentClient);
 
-let insertFollowQueryMock: jest.Mock<any, any, any>;
-let selectFollowQueryMock: jest.Mock<any, any, any>;
-let selectFolloweeQueryMock: jest.Mock<any, any, any>;
-
 const usersTableName = "users-table-offline";
 
-const followersSelectedFromTable = [{ followee_id: "@z" }];
-const followeesSelectedFromTable = [
-    { follower_id: "@a" },
-    { follower_id: "@b" },
-    { follower_id: "@c" },
-    { follower_id: "@z" },
-];
+jest.mock("@/config", () => {
+    const actual = jest.requireActual("@/config");
+    return {
+        ...actual,
+        envConfig: {
+            USERS_TABLE: "users-table-offline",
+        },
+    };
+});
 
-jest.mock("@/config", () => ({
-    envConfig: {
-        USERS_TABLE: "users-table-offline",
-    },
-    dbConfig: {
-        DB_HOST: "",
-        DB_USER: "",
-        DB_PASSWORD: "",
-        DB_NAME: "",
-    },
-}));
+let invokeTokenValidatorMock = jest.fn();
+let invokeLambdaMock = jest.fn();
 jest.mock("@/utility", () => {
     const actual = jest.requireActual("@/utility");
     return {
         ...actual,
-        getRDSDBClient: jest.fn(() => ({
-            query: (sql: string, params: any[]) => {
-                if (sql.includes("INSERT INTO wordlessdb.follow_table")) {
-                    return insertFollowQueryMock(sql, params);
-                } else if (
-                    sql.includes(
-                        "SELECT followee_id FROM wordlessdb.follow_table WHERE follower_id",
-                    )
-                ) {
-                    return selectFollowQueryMock(sql, params);
-                } else if (
-                    sql.includes(
-                        "SELECT follower_id FROM wordlessdb.follow_table WHERE followee_id",
-                    )
-                ) {
-                    return selectFolloweeQueryMock(sql, params);
-                }
-            },
-            end: () => {},
-        })),
+        invokeTokenValidator: () => invokeTokenValidatorMock(),
+        invokeLambda: () => invokeLambdaMock(),
     };
 });
 
@@ -105,13 +76,15 @@ const testSetUp = (setUpDB: {
 
 beforeEach(() => {
     ddbMock.reset();
-    insertFollowQueryMock = jest.fn().mockResolvedValue([]);
-    selectFollowQueryMock = jest
-        .fn()
-        .mockResolvedValue(followersSelectedFromTable);
-    selectFolloweeQueryMock = jest
-        .fn()
-        .mockResolvedValue(followeesSelectedFromTable);
+    invokeTokenValidatorMock = jest.fn(() => "valid");
+    invokeLambdaMock = jest.fn(() => {
+        return {
+            totalNumberOfFollowing: 1,
+            followingUserIds: ["@z"],
+            totalNumberOfFollowees: 4,
+            followeeUserIds: ["@a", "@b", "@c", "@z"],
+        };
+    });
 });
 
 // NOTE: @a が、@y をフォローするシチュエーションとする
@@ -124,7 +97,7 @@ describe("正常系", () => {
     });
 
     test("フォローしているユーザーと、フォローされているユーザーを取得する", async () => {
-        const response = await postFollow(
+        const response = await postFollowEntry(
             getHandlerRequest({
                 pathParameters: {
                     userId: "@y",
@@ -138,75 +111,25 @@ describe("正常系", () => {
         expect(response.statusCode).toBe(200);
         expect(response.body).toEqual(
             JSON.stringify({
-                totalNumberOfFollowing: followersSelectedFromTable.length,
+                totalNumberOfFollowing: 1,
                 followingUserIds: ["@z"],
-                totalNumberOfFollowees: followeesSelectedFromTable.length,
+                totalNumberOfFollowees: 4,
                 followeeUserIds: ["@a", "@b", "@c", "@z"],
             }),
         );
     });
 
-    test("@aが@yをフォローするQueryが実行される", async () => {
-        await postFollow(
-            getHandlerRequest({
-                pathParameters: {
-                    userId: "@y",
-                },
-                body: JSON.stringify({
-                    followerId: "@a",
-                }),
-            }),
-        );
-
-        expect(insertFollowQueryMock).toHaveBeenCalledWith(
-            "INSERT INTO wordlessdb.follow_table (follower_id, followee_id) VALUES (?, ?)",
-            ["@a", "@y"],
-        );
-    });
-
-    test("フォローしているユーザーを取得するQueryが実行される", async () => {
-        await postFollow(
-            getHandlerRequest({
-                pathParameters: {
-                    userId: "@y",
-                },
-                body: JSON.stringify({
-                    followerId: "@a",
-                }),
-            }),
-        );
-
-        expect(selectFollowQueryMock).toHaveBeenCalledWith(
-            "SELECT followee_id FROM wordlessdb.follow_table WHERE follower_id = ?",
-            ["@y"],
-        );
-    });
-
-    test("フォローされているユーザーを取得するQueryが実行される", async () => {
-        await postFollow(
-            getHandlerRequest({
-                pathParameters: {
-                    userId: "@y",
-                },
-                body: JSON.stringify({
-                    followerId: "@a",
-                }),
-            }),
-        );
-
-        expect(selectFolloweeQueryMock).toHaveBeenCalledWith(
-            "SELECT follower_id FROM wordlessdb.follow_table WHERE followee_id = ?",
-            ["@y"],
-        );
-    });
-
     test("フォローしているユーザーが0人の時、totalNumberOfFollowingが0となる", async () => {
-        selectFollowQueryMock = jest.fn().mockResolvedValue([]);
-        selectFolloweeQueryMock = jest
-            .fn()
-            .mockResolvedValue([{ follower_id: "@a" }]);
+        invokeLambdaMock = jest.fn(() => {
+            return {
+                totalNumberOfFollowing: 0,
+                followingUserIds: [],
+                totalNumberOfFollowees: 1,
+                followeeUserIds: ["@a"],
+            };
+        });
 
-        const response = await postFollow(
+        const response = await postFollowEntry(
             getHandlerRequest({
                 pathParameters: {
                     userId: "@y",
@@ -236,7 +159,7 @@ describe("異常系", () => {
             isUserDBSetupForY: "ok",
         });
 
-        const response = await postFollow(getHandlerRequest({}));
+        const response = await postFollowEntry(getHandlerRequest({}));
 
         expect(response.statusCode).toBe(400);
         expect(response.body).toEqual(
@@ -252,7 +175,7 @@ describe("異常系", () => {
             isUserDBSetupForY: "ok",
         });
 
-        const response = await postFollow(
+        const response = await postFollowEntry(
             getHandlerRequest({
                 pathParameters: { userId: "@y" },
             }),
@@ -272,7 +195,7 @@ describe("異常系", () => {
             isUserDBSetupForY: "ok",
         });
 
-        const response = await postFollow(
+        const response = await postFollowEntry(
             getHandlerRequest({
                 pathParameters: {},
             }),
@@ -286,13 +209,35 @@ describe("異常系", () => {
         );
     });
 
+    test("トークンの検証に失敗した時、AUN-99と401エラーを返す", async () => {
+        invokeTokenValidatorMock = jest.fn(() => "invalid");
+
+        const response = await postFollowEntry(
+            getHandlerRequest({
+                pathParameters: {
+                    userId: "@y",
+                },
+                body: JSON.stringify({
+                    followerId: "@a",
+                }),
+            }),
+        );
+
+        expect(response.statusCode).toBe(401);
+        expect(response.body).toEqual(
+            JSON.stringify({
+                error: "AUN-99",
+            }),
+        );
+    });
+
     test("リクエストのuserIdが空文字の時、ステータスコード400とFOL-12を返す", async () => {
         testSetUp({
             isUserDBSetupForA: "ok",
             isUserDBSetupForY: "ok",
         });
 
-        const response = await postFollow(
+        const response = await postFollowEntry(
             getHandlerRequest({
                 pathParameters: {
                     userId: "",
@@ -317,7 +262,7 @@ describe("異常系", () => {
             isUserDBSetupForY: "ok",
         });
 
-        const response = await postFollow(
+        const response = await postFollowEntry(
             getHandlerRequest({
                 pathParameters: {
                     userId: "@y",
@@ -342,7 +287,7 @@ describe("異常系", () => {
             isUserDBSetupForY: "ok",
         });
 
-        const response = await postFollow(
+        const response = await postFollowEntry(
             getHandlerRequest({
                 pathParameters: {
                     userId: "@y",
@@ -367,7 +312,7 @@ describe("異常系", () => {
             isUserDBSetupForY: "ok",
         });
 
-        const response = await postFollow(
+        const response = await postFollowEntry(
             getHandlerRequest({
                 pathParameters: {
                     userId: "@y",
@@ -388,7 +333,7 @@ describe("異常系", () => {
             isUserDBSetupForY: "ok",
         });
 
-        const response = await postFollow(
+        const response = await postFollowEntry(
             getHandlerRequest({
                 pathParameters: {
                     userId: "@y",
@@ -409,7 +354,7 @@ describe("異常系", () => {
             isUserDBSetupForY: "notfound",
         });
 
-        const response = await postFollow(
+        const response = await postFollowEntry(
             getHandlerRequest({
                 pathParameters: {
                     userId: "@y",
@@ -430,7 +375,7 @@ describe("異常系", () => {
             isUserDBSetupForY: "fail",
         });
 
-        const response = await postFollow(
+        const response = await postFollowEntry(
             getHandlerRequest({
                 pathParameters: {
                     userId: "@y",
@@ -445,18 +390,16 @@ describe("異常系", () => {
         expect(response.body).toEqual(JSON.stringify({ error: "FOL-14" }));
     });
 
-    test("フォロー関係を登録する際、FollowTableと接続できないとき、ステータスコード500とFOL-15を返す", async () => {
+    test("Lambdaでエラーが発生した時、ステータスコード500とFOL-15を返す", async () => {
+        invokeLambdaMock = jest.fn(() => "lambdaInvokeError");
         testSetUp({
             isUserDBSetupForA: "ok",
             isUserDBSetupForY: "ok",
         });
-        insertFollowQueryMock = jest.fn().mockRejectedValue(new Error());
 
-        const response = await postFollow(
+        const response = await postFollowEntry(
             getHandlerRequest({
-                pathParameters: {
-                    userId: "@y",
-                },
+                pathParameters: { userId: "@y" },
                 body: JSON.stringify({
                     followerId: "@a",
                 }),
@@ -464,62 +407,6 @@ describe("異常系", () => {
         );
 
         expect(response.statusCode).toBe(500);
-        expect(response.body).toEqual(
-            JSON.stringify({
-                error: "FOL-15",
-            }),
-        );
-    });
-
-    test("フォローしているユーザーを取得する際、FollowTableと接続できないとき、ステータスコード500とFOL-15を返す", async () => {
-        testSetUp({
-            isUserDBSetupForA: "ok",
-            isUserDBSetupForY: "ok",
-        });
-        selectFollowQueryMock = jest.fn().mockRejectedValue(new Error());
-
-        const response = await postFollow(
-            getHandlerRequest({
-                pathParameters: {
-                    userId: "@y",
-                },
-                body: JSON.stringify({
-                    followerId: "@a",
-                }),
-            }),
-        );
-
-        expect(response.statusCode).toBe(500);
-        expect(response.body).toEqual(
-            JSON.stringify({
-                error: "FOL-15",
-            }),
-        );
-    });
-
-    test("フォローされているユーザーを取得する際、FollowTableと接続できないとき、ステータスコード500とFOL-15を返す", async () => {
-        testSetUp({
-            isUserDBSetupForA: "ok",
-            isUserDBSetupForY: "ok",
-        });
-        selectFolloweeQueryMock = jest.fn().mockRejectedValue(new Error());
-
-        const response = await postFollow(
-            getHandlerRequest({
-                pathParameters: {
-                    userId: "@y",
-                },
-                body: JSON.stringify({
-                    followerId: "@a",
-                }),
-            }),
-        );
-
-        expect(response.statusCode).toBe(500);
-        expect(response.body).toEqual(
-            JSON.stringify({
-                error: "FOL-15",
-            }),
-        );
+        expect(response.body).toEqual(JSON.stringify({ error: "FOL-15" }));
     });
 });
