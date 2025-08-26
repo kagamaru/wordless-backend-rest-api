@@ -158,8 +158,8 @@ functions:
           authorizer:
             type: COGNITO_USER_POOLS
             authorizerId: ${env:COGNITO_AUTHORIZER_ID}
-  deleteEmote:
-    handler: app/emote/deleteEmote.deleteEmote
+  deleteEmoteEntry:
+    handler: app/emote/deleteEmoteEntry.deleteEmoteEntry
     events:
       - http:
           path: emote/{emoteId}
@@ -178,6 +178,8 @@ functions:
           authorizer:
             type: COGNITO_USER_POOLS
             authorizerId: ${env:COGNITO_AUTHORIZER_ID}
+  deleteEmoteCore:
+    handler: app/emote/deleteEmoteCore.deleteEmoteCore
     vpc:
       securityGroupIds: ${self:custom.security-group-id.${sls:stage}}
       subnetIds: ${self:custom.vpc_subnet_id.${sls:stage}}
