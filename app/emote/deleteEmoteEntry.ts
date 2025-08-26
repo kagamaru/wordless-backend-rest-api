@@ -45,7 +45,7 @@ export const deleteEmoteEntry = async (
         );
     }
 
-    if (!userId) {
+    if (!userId || typeof userId !== "string") {
         return createErrorResponse(400, { error: "EMT-14" }, originName);
     }
 

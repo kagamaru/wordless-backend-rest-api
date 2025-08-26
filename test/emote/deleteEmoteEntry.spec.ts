@@ -121,7 +121,8 @@ describe("異常系", () => {
         );
     });
 
-    test.each(["", undefined])(
+    // NOTE: 空文字、undefined、数値はユーザーIDとして不正
+    test.each(["", undefined, 1234567890])(
         "リクエストボディのuserIdが%sの時、ステータスコード400とEMT-14を返す",
         async (userId) => {
             const response = await deleteEmoteEntry(
