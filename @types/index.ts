@@ -8,4 +8,5 @@ export * from "@/@types/FollowCorePayload";
 export * from "@/@types/FollowCoreResponse";
 export * from "@/@types/UserSubInfo";
 export * from "@/@types/User";
+export * from "@/@types/UserSubAndVerifyResult";
 export * from "@/@types/UserSukiEmojis";
