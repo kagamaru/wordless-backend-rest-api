@@ -60,6 +60,8 @@ provider:
 functions:
   verifyToken:
     handler: app/auth/verifyToken.verifyToken
+  verifyTokenAndGetUserSub:
+    handler: app/auth/verifyTokenAndGetUserSub.verifyTokenAndGetUserSub
   getUserHandler:
     handler: app/users/findUser.findUser
     events:
