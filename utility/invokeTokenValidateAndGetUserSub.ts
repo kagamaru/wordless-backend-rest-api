@@ -10,7 +10,7 @@ export const invokeTokenValidateAndGetUserSub = async (
 ): Promise<UserSubAndVerifyResult> => {
     const lambdaClient = getLambdaClient();
     const invokeCommand = new InvokeCommand({
-        FunctionName: envConfig.TOKEN_VALIDATOR_LAMBDA_NAME,
+        FunctionName: envConfig.TOKEN_VALIDATOR_AND_GET_USER_SUB_LAMBDA_NAME,
         InvocationType: "RequestResponse",
         Payload: JSON.stringify({ authHeader, userId }),
     });
