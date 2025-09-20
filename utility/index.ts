@@ -7,6 +7,7 @@ export * from "@/utility/getLambdaClient";
 export * from "@/utility/getRDSDBClient";
 export * from "@/utility/getS3Client";
 export * from "@/utility/invokeLambda";
+export * from "@/utility/invokeTokenValidateAndGetUserSub";
 export * from "@/utility/invokeTokenValidator";
 export * from "@/utility/putToDynamoDB";
 export * from "@/utility/verifyUserName";
