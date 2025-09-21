@@ -6,13 +6,12 @@ import { UserSubAndVerifyResult } from "@/@types";
 
 export const invokeTokenValidateAndGetUserSub = async (
     authHeader: string,
-    userId: string,
 ): Promise<UserSubAndVerifyResult> => {
     const lambdaClient = getLambdaClient();
     const invokeCommand = new InvokeCommand({
         FunctionName: envConfig.TOKEN_VALIDATOR_AND_GET_USER_SUB_LAMBDA_NAME,
         InvocationType: "RequestResponse",
-        Payload: JSON.stringify({ authHeader, userId }),
+        Payload: JSON.stringify({ authHeader }),
     });
 
     let payload: Uint8ArrayBlobAdapter;
@@ -28,7 +27,10 @@ export const invokeTokenValidateAndGetUserSub = async (
 
     try {
         const result = JSON.parse(payload.transformToString());
-        return result;
+        return {
+            userSub: result.userSub,
+            isValid: "valid",
+        };
     } catch (error) {
         console.error(error);
         return {
