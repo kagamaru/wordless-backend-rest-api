@@ -83,6 +83,26 @@ functions:
           authorizer:
             type: COGNITO_USER_POOLS
             authorizerId: ${env:COGNITO_AUTHORIZER_ID}
+  postUser:
+    handler: app/users/postUser.postUser
+    events:
+      - http:
+          path: users/{userId}
+          method: post
+          cors:
+            origin: ${env:FRONTEND_URL}
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Requested-With
+            methods:
+              - POST
+              - OPTIONS
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId: ${env:COGNITO_AUTHORIZER_ID}
   findUserSub:
     handler: app/users/findUserSub.findUserSub
     events:
