@@ -38,7 +38,6 @@ export const postUser = async (
 
     const tokenResult = await invokeTokenValidateAndGetUserSub(
         event.headers.Authorization,
-        userId,
     );
     if (tokenResult.isValid !== "valid") {
         return createErrorResponse(401, { error: "AUN-99" }, originName);
@@ -70,6 +69,15 @@ export const postUser = async (
         });
     } catch {
         return createErrorResponse(500, { error: "USE-37" }, originName);
+    }
+
+    try {
+        await putToDynamoDB(envConfig.USER_SUKI_TABLE, {
+            userId,
+            userSuki: [],
+        });
+    } catch {
+        return createErrorResponse(500, { error: "USE-38" }, originName);
     }
 
     return createResponse({ userId }, originName);

@@ -1,7 +1,6 @@
 import { JwtPayload } from "aws-jwt-verify/jwt-model";
-import { envConfig } from "@/config";
-import { UserSubAndVerifyResult, UserSubInfo } from "@/@types";
-import { getCognitoJwtVerifier, getItemFromDynamoDB } from "@/utility";
+import { UserSubAndVerifyResult } from "@/@types";
+import { getCognitoJwtVerifier } from "@/utility";
 
 const handleError = (error: unknown): "invalid" => {
     console.error(error);
@@ -10,10 +9,8 @@ const handleError = (error: unknown): "invalid" => {
 
 export const verifyTokenAndGetUserSub = async ({
     authHeader,
-    userId,
 }: {
     authHeader: string;
-    userId: string;
 }): Promise<UserSubAndVerifyResult | "invalid"> => {
     let token: string;
     try {
@@ -31,17 +28,8 @@ export const verifyTokenAndGetUserSub = async ({
         return handleError(error);
     }
 
-    let userSubInfo: UserSubInfo;
-    try {
-        userSubInfo = (await getItemFromDynamoDB(envConfig.USER_SUB_TABLE, {
-            userSub: payload.sub,
-        })) as UserSubInfo;
-    } catch (error) {
-        return handleError(error);
-    }
-
     return {
-        userSub: userSubInfo.userSub,
-        isValid: userSubInfo.userId === userId ? "valid" : "invalid",
+        userSub: payload.sub,
+        isValid: "valid",
     };
 };

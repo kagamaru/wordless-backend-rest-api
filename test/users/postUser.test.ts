@@ -2,15 +2,18 @@ import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { mockClient } from "aws-sdk-client-mock";
 import { postUser } from "@/app/users/postUser";
 import { getHandlerRequest } from "@/test/testutils/getHandlerRequest";
+import { ConditionalCheckFailedException } from "@aws-sdk/client-dynamodb";
 
 const ddbMock = mockClient(DynamoDBDocumentClient);
 const usersTableName = "users-table-offline";
 const userSubTableName = "user-sub-table-offline";
+const userSukiTableName = "user-suki-table-offline";
 
 jest.mock("@/config", () => ({
     envConfig: {
         USERS_TABLE: "users-table-offline",
         USER_SUB_TABLE: "user-sub-table-offline",
+        USER_SUKI_TABLE: "user-suki-table-offline",
     },
 }));
 
@@ -27,6 +30,7 @@ jest.mock("@/utility", () => {
 const testSetUp = (setUp: {
     isUserSubDBPostSetup: "ok" | "fail";
     isUserDBPostSetup: "ok" | "fail" | "duplicate";
+    isUserSukiDBPostSetup: "ok" | "fail";
 }): void => {
     const userSubDdbPostMock = ddbMock.on(PutCommand, {
         TableName: userSubTableName,
@@ -41,6 +45,13 @@ const testSetUp = (setUp: {
             userId: "@a",
         },
     });
+    const userSukiDdbPostMock = ddbMock.on(PutCommand, {
+        TableName: userSukiTableName,
+        Item: {
+            userId: "@a",
+            userSuki: [],
+        },
+    });
 
     if (setUp.isUserSubDBPostSetup === "ok") {
         userSubDdbPostMock.resolves({});
@@ -51,9 +62,20 @@ const testSetUp = (setUp: {
     if (setUp.isUserDBPostSetup === "ok") {
         userDdbPostMock.resolves({});
     } else if (setUp.isUserDBPostSetup === "duplicate") {
-        userDdbPostMock.rejects(new Error("Duplicate userId"));
+        userDdbPostMock.rejects(
+            new ConditionalCheckFailedException({
+                $metadata: {},
+                message: "Duplicate userId",
+            }),
+        );
     } else if (setUp.isUserDBPostSetup === "fail") {
         userDdbPostMock.rejects(new Error());
+    }
+
+    if (setUp.isUserSukiDBPostSetup === "ok") {
+        userSukiDdbPostMock.resolves({});
+    } else if (setUp.isUserSukiDBPostSetup === "fail") {
+        userSukiDdbPostMock.rejects(new Error());
     }
 };
 
@@ -70,6 +92,7 @@ describe("正常系", () => {
         testSetUp({
             isUserSubDBPostSetup: "ok",
             isUserDBPostSetup: "ok",
+            isUserSukiDBPostSetup: "ok",
         });
     });
 
@@ -128,6 +151,7 @@ describe("異常系", () => {
         testSetUp({
             isUserSubDBPostSetup: "ok",
             isUserDBPostSetup: "ok",
+            isUserSukiDBPostSetup: "ok",
         });
 
         const response = await postUser(
@@ -150,6 +174,7 @@ describe("異常系", () => {
         testSetUp({
             isUserSubDBPostSetup: "ok",
             isUserDBPostSetup: "ok",
+            isUserSukiDBPostSetup: "ok",
         });
 
         const response = await postUser(
@@ -173,6 +198,7 @@ describe("異常系", () => {
         testSetUp({
             isUserSubDBPostSetup: "ok",
             isUserDBPostSetup: "ok",
+            isUserSukiDBPostSetup: "ok",
         });
 
         const response = await postUser(
@@ -196,6 +222,7 @@ describe("異常系", () => {
         testSetUp({
             isUserSubDBPostSetup: "ok",
             isUserDBPostSetup: "ok",
+            isUserSukiDBPostSetup: "ok",
         });
 
         const response = await postUser(
@@ -216,6 +243,7 @@ describe("異常系", () => {
         testSetUp({
             isUserSubDBPostSetup: "ok",
             isUserDBPostSetup: "ok",
+            isUserSukiDBPostSetup: "ok",
         });
 
         const response = await postUser(
@@ -246,6 +274,7 @@ describe("異常系", () => {
         testSetUp({
             isUserSubDBPostSetup: "ok",
             isUserDBPostSetup: "ok",
+            isUserSukiDBPostSetup: "ok",
         });
 
         const response = await postUser(
@@ -276,6 +305,7 @@ describe("異常系", () => {
             testSetUp({
                 isUserSubDBPostSetup: "ok",
                 isUserDBPostSetup: "ok",
+                isUserSukiDBPostSetup: "ok",
             });
 
             const response = await postUser(
@@ -321,6 +351,7 @@ describe("異常系", () => {
         testSetUp({
             isUserSubDBPostSetup: "ok",
             isUserDBPostSetup: "fail",
+            isUserSukiDBPostSetup: "ok",
         });
 
         const response = await postUser(
@@ -342,6 +373,7 @@ describe("異常系", () => {
         testSetUp({
             isUserSubDBPostSetup: "ok",
             isUserDBPostSetup: "duplicate",
+            isUserSukiDBPostSetup: "ok",
         });
 
         const response = await postUser(
@@ -363,6 +395,7 @@ describe("異常系", () => {
         testSetUp({
             isUserSubDBPostSetup: "fail",
             isUserDBPostSetup: "ok",
+            isUserSukiDBPostSetup: "ok",
         });
 
         const response = await postUser(
@@ -376,6 +409,28 @@ describe("異常系", () => {
         expect(response.body).toEqual(
             JSON.stringify({
                 error: "USE-37",
+            }),
+        );
+    });
+
+    test("userSukiの登録時、userSukiTableと接続できなかった場合、USE-38と500エラーを返す", async () => {
+        testSetUp({
+            isUserSubDBPostSetup: "ok",
+            isUserDBPostSetup: "ok",
+            isUserSukiDBPostSetup: "fail",
+        });
+
+        const response = await postUser(
+            getHandlerRequest({
+                pathParameters: { userId: "@a" },
+                body: JSON.stringify({ userName: "test-user" }),
+            }),
+        );
+
+        expect(response.statusCode).toBe(500);
+        expect(response.body).toEqual(
+            JSON.stringify({
+                error: "USE-38",
             }),
         );
     });

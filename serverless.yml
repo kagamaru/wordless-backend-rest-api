@@ -29,6 +29,7 @@ provider:
             - Fn::GetAtt: [UserSukiTable, Arn]
             - arn:aws:s3:::${env:USER_IMAGE_BUCKET}/*
             - arn:aws:lambda:${env:MY_AWS_REGION}:${aws:accountId}:function:${env:TOKEN_VALIDATOR_LAMBDA_NAME}
+            - arn:aws:lambda:${env:MY_AWS_REGION}:${aws:accountId}:function:${env:TOKEN_VALIDATOR_AND_GET_USER_SUB_LAMBDA_NAME}
             - arn:aws:lambda:${env:MY_AWS_REGION}:${aws:accountId}:function:${env:POST_FOLLOW_LAMBDA_NAME}
             - arn:aws:lambda:${env:MY_AWS_REGION}:${aws:accountId}:function:${env:DELETE_FOLLOW_LAMBDA_NAME}
             - arn:aws:lambda:${env:MY_AWS_REGION}:${aws:accountId}:function:${env:DELETE_EMOTE_LAMBDA_NAME}
