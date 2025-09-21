@@ -10,6 +10,7 @@ import {
 } from "@/utility";
 
 const handleDynamoDBError = (error: Error, originName: string) => {
+    console.error(error);
     if (error.message === "Cannot find item") {
         return createErrorResponse(
             404,

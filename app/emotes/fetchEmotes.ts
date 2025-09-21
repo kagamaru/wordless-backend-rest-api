@@ -79,6 +79,7 @@ export const fetchEmotes = async (
             }
         }
     } catch (error) {
+        console.error(error);
         return createErrorResponse(
             500,
             {
@@ -112,6 +113,7 @@ export const fetchEmotes = async (
                 },
             );
         } catch (error) {
+            console.error(error);
             return createErrorResponse(
                 500,
                 {
@@ -137,6 +139,7 @@ export const fetchEmotes = async (
                     }>
                 >;
         } catch (error) {
+            console.error(error);
             return createErrorResponse(
                 500,
                 {

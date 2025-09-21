@@ -44,6 +44,7 @@ export const fetchFollow = async (
             [userId],
         );
     } catch (error) {
+        console.error(error);
         return createErrorResponse(
             500,
             {

@@ -56,6 +56,7 @@ export const postUserName = async (
             userId,
         })) as User;
     } catch (error) {
+        console.error(error);
         if (error.message === "Cannot find item") {
             return createErrorResponse(
                 404,
@@ -79,6 +80,7 @@ export const postUserName = async (
     try {
         requestBody = JSON.parse(event.body);
     } catch (error) {
+        console.error(error);
         return createErrorResponse(
             400,
             {
