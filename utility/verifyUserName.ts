@@ -3,7 +3,7 @@ export const verifyUserName = (userName: any): "ok" | "error" => {
         return "error";
     }
 
-    if (!/^[A-Za-z0-9._-]+$/.test(userName)) {
+    if (!/^[A-Za-z0-9.\-_]{1,24}$/.test(userName)) {
         return "error";
     }
 

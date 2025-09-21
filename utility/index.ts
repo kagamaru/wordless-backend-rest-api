@@ -10,4 +10,5 @@ export * from "@/utility/invokeLambda";
 export * from "@/utility/invokeTokenValidateAndGetUserSub";
 export * from "@/utility/invokeTokenValidator";
 export * from "@/utility/putToDynamoDB";
+export * from "@/utility/verifyUserId";
 export * from "@/utility/verifyUserName";
