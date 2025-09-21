@@ -35,7 +35,8 @@ export const deleteEmoteEntry = async (
     let userId: string;
     try {
         userId = JSON.parse(event.body).userId;
-    } catch {
+    } catch (error) {
+        console.error(error);
         return createErrorResponse(
             400,
             {
@@ -75,6 +76,7 @@ export const deleteEmoteEntry = async (
             return createResponse({}, originName);
         }
     } catch (error) {
+        console.error(error);
         return createErrorResponse(500, { error: "EMT-16" }, originName);
     }
 };

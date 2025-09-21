@@ -37,6 +37,7 @@ export const postUserSuki = async (
     try {
         body = JSON.parse(event.body) as PostUserSukiPayload;
     } catch (error) {
+        console.error(error);
         return createErrorResponse(
             400,
             {
@@ -87,6 +88,7 @@ export const postUserSuki = async (
             userId: pathParameterUserId,
         });
     } catch (error) {
+        console.error(error);
         if (error.message === "Cannot find item") {
             return createErrorResponse(
                 404,
@@ -116,6 +118,7 @@ export const postUserSuki = async (
             ],
         });
     } catch (error) {
+        console.error(error);
         return createErrorResponse(
             500,
             {
@@ -134,6 +137,7 @@ export const postUserSuki = async (
         );
         return createResponse({ userSuki }, originName);
     } catch (error) {
+        console.error(error);
         if (error.message === "Cannot find item") {
             return createErrorResponse(
                 404,

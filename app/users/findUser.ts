@@ -30,6 +30,7 @@ export const findUser = async (
 
         return createResponse({ userId, userName, userAvatarUrl }, originName);
     } catch (error) {
+        console.error(error);
         if (error.message === "Cannot find item") {
             return createErrorResponse(
                 404,

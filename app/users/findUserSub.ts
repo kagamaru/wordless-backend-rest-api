@@ -44,6 +44,7 @@ export const findUserSub = async (
             })
         ).userId as string;
     } catch (error) {
+        console.error(error);
         return handleErrorResponse(
             error.message === "Cannot find item" ? "USE-12" : "USE-13",
             originName,
@@ -58,6 +59,7 @@ export const findUserSub = async (
 
         return createResponse({ userId, userName, userAvatarUrl }, originName);
     } catch (error) {
+        console.error(error);
         return handleErrorResponse(
             error.message === "Cannot find item" ? "USE-14" : "USE-15",
             originName,

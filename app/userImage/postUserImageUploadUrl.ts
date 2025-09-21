@@ -50,7 +50,8 @@ export const postUserImageUploadUrl = async (
     let body: PostUserImageRequestBody;
     try {
         body = JSON.parse(event.body) as PostUserImageRequestBody;
-    } catch {
+    } catch (error) {
+        console.error(error);
         return createErrorResponse(400, { error: "IMG-03" }, originName);
     }
 
@@ -87,6 +88,7 @@ export const postUserImageUploadUrl = async (
         // NOTE: 署名URLの有効期限は60秒とする
         putUrl = await getSignedUrl(s3Client, putCmd, { expiresIn: 60 });
     } catch (error) {
+        console.error(error);
         return createErrorResponse(500, { error: "IMG-06" }, originName);
     }
 
@@ -99,6 +101,7 @@ export const postUserImageUploadUrl = async (
         });
         fetchedUserName = userName as string;
     } catch (error) {
+        console.error(error);
         if (error.message === "Cannot find item") {
             return createErrorResponse(
                 404,
@@ -124,6 +127,7 @@ export const postUserImageUploadUrl = async (
             userName: fetchedUserName,
         });
     } catch (error) {
+        console.error(error);
         return createErrorResponse(500, { error: "IMG-09" }, originName);
     }
 

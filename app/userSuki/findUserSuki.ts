@@ -30,6 +30,7 @@ export const findUserSuki = async (
 
         return createResponse({ userSuki }, originName);
     } catch (error) {
+        console.error(error);
         if (error.message === "Cannot find item") {
             return createErrorResponse(
                 404,

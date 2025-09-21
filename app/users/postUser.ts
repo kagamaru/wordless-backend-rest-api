@@ -24,7 +24,8 @@ export const postUser = async (
     try {
         body = JSON.parse(event.body);
         userName = body.userName;
-    } catch {
+    } catch (error) {
+        console.error(error);
         return createErrorResponse(400, { error: "USE-32" }, originName);
     }
 
@@ -56,6 +57,7 @@ export const postUser = async (
             "attribute_not_exists(userId)",
         );
     } catch (e: any) {
+        console.error(e);
         if (e && e.message && e.message.includes("Duplicate")) {
             return createErrorResponse(400, { error: "USE-36" }, originName);
         }
@@ -67,7 +69,8 @@ export const postUser = async (
             userSub: tokenResult.userSub,
             userId,
         });
-    } catch {
+    } catch (error) {
+        console.error(error);
         return createErrorResponse(500, { error: "USE-37" }, originName);
     }
 
@@ -76,7 +79,8 @@ export const postUser = async (
             userId,
             userSuki: [],
         });
-    } catch {
+    } catch (error) {
+        console.error(error);
         return createErrorResponse(500, { error: "USE-38" }, originName);
     }
 
