@@ -17,9 +17,10 @@ export async function putToDynamoDB<T>(
             }),
         );
     } catch (error) {
-        if (error.message.includes("ConditionalCheckFailedException")) {
+        if (error.message === "The conditional request failed") {
             throw new Error("Duplicate");
+        } else {
+            throw error;
         }
-        throw error;
     }
 }
