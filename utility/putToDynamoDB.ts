@@ -17,8 +17,15 @@ export async function putToDynamoDB<T>(
             }),
         );
     } catch (error) {
-        if (error.message === "The conditional request failed") {
-            throw new Error("Duplicate");
+        if (
+            ConditionExpression &&
+            error.message === "The conditional request failed"
+        ) {
+            if (ConditionExpression.includes("attribute_not_exists")) {
+                throw new Error("Duplicate");
+            } else if (ConditionExpression.includes("attribute_exists")) {
+                throw new Error("Not found");
+            }
         } else {
             throw error;
         }

@@ -33,6 +33,7 @@ provider:
             - arn:aws:lambda:${env:MY_AWS_REGION}:${aws:accountId}:function:${env:POST_FOLLOW_LAMBDA_NAME}
             - arn:aws:lambda:${env:MY_AWS_REGION}:${aws:accountId}:function:${env:DELETE_FOLLOW_LAMBDA_NAME}
             - arn:aws:lambda:${env:MY_AWS_REGION}:${aws:accountId}:function:${env:DELETE_EMOTE_LAMBDA_NAME}
+            - arn:aws:lambda:${env:MY_AWS_REGION}:${aws:accountId}:function:${env:DELETE_USER_LAMBDA_NAME}
   environment:
     EMOTE_REACTION_TABLE: emote-reaction-table-${sls:stage}
     USERS_TABLE: users-table-${sls:stage}
@@ -56,6 +57,7 @@ provider:
     POST_FOLLOW_LAMBDA_NAME: ${env:POST_FOLLOW_LAMBDA_NAME}
     DELETE_FOLLOW_LAMBDA_NAME: ${env:DELETE_FOLLOW_LAMBDA_NAME}
     DELETE_EMOTE_LAMBDA_NAME: ${env:DELETE_EMOTE_LAMBDA_NAME}
+    DELETE_USER_LAMBDA_NAME: ${env:DELETE_USER_LAMBDA_NAME}
   # 初回実行時はコメントアウトする
   apiName: wordless-backend-rest-api-${sls:stage}
 
@@ -64,6 +66,31 @@ functions:
     handler: app/auth/verifyToken.verifyToken
   verifyTokenAndGetUserSub:
     handler: app/auth/verifyTokenAndGetUserSub.verifyTokenAndGetUserSub
+  deleteUserEntry:
+    handler: app/users/deleteUser/deleteUserEntry.deleteUserEntry
+    events:
+      - http:
+          path: users/{userId}
+          method: delete
+          cors:
+            origin: ${env:FRONTEND_URL}
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Requested-With
+            methods:
+              - DELETE
+              - OPTIONS
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId: ${env:COGNITO_AUTHORIZER_ID}
+  deleteUserCore:
+    handler: app/users/deleteUser/deleteUserCore.deleteUserCore
+    vpc:
+      securityGroupIds: ${self:custom.security-group-id.${sls:stage}}
+      subnetIds: ${self:custom.vpc_subnet_id.${sls:stage}}
   getUserHandler:
     handler: app/users/findUser.findUser
     events:
