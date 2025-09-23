@@ -7,6 +7,7 @@ import {
 import { envConfig } from "@/config";
 import { putToDynamoDB } from "@/utility/putToDynamoDB";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
+import { BLACKLISTED } from "@/static/blackListIds";
 
 export const deleteUserEntry = async (
     event: APIGatewayProxyEvent,
@@ -22,6 +23,10 @@ export const deleteUserEntry = async (
     }
     const userId = event.pathParameters.userId;
 
+    if (BLACKLISTED.has(userId)) {
+        return createErrorResponse(400, { error: "USE-42" }, originName);
+    }
+
     const tokenResult = await invokeTokenValidator(
         event.headers.Authorization,
         userId,
@@ -34,7 +39,7 @@ export const deleteUserEntry = async (
         userId,
     });
     if (lambdaResult === "lambdaInvokeError") {
-        return createErrorResponse(500, { error: "USE-42" }, originName);
+        return createErrorResponse(500, { error: "USE-43" }, originName);
     }
 
     try {
@@ -51,9 +56,9 @@ export const deleteUserEntry = async (
         );
     } catch (e: any) {
         if (e && e.message && e.message.includes("Not found")) {
-            return createErrorResponse(404, { error: "USE-43" }, originName);
+            return createErrorResponse(404, { error: "USE-44" }, originName);
         }
-        return createErrorResponse(500, { error: "USE-44" }, originName);
+        return createErrorResponse(500, { error: "USE-45" }, originName);
     }
 
     try {
@@ -64,9 +69,9 @@ export const deleteUserEntry = async (
         );
     } catch (e: any) {
         if (e && e.message && e.message.includes("Not found")) {
-            return createErrorResponse(404, { error: "USE-45" }, originName);
+            return createErrorResponse(404, { error: "USE-46" }, originName);
         }
-        return createErrorResponse(500, { error: "USE-46" }, originName);
+        return createErrorResponse(500, { error: "USE-47" }, originName);
     }
 
     return createResponse({}, originName);
