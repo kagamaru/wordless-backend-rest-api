@@ -156,7 +156,21 @@ describe("異常系", () => {
         );
     });
 
-    test("Lambdaでエラーが発生した時、ステータスコード500とUSE-42を返す", async () => {
+    test.each(["@wl_nozomi", "@wl_nico"])(
+        "指定されたユーザーIDがブラックリストに含まれている時、ステータスコード400とUSE-42を返す",
+        async (userId) => {
+            const response = await deleteUserEntry(
+                getHandlerRequest({
+                    pathParameters: { userId },
+                }),
+            );
+
+            expect(response.statusCode).toBe(400);
+            expect(response.body).toEqual(JSON.stringify({ error: "USE-42" }));
+        },
+    );
+
+    test("Lambdaでエラーが発生した時、ステータスコード500とUSE-43を返す", async () => {
         invokeLambdaMock = jest.fn(() => "lambdaInvokeError");
 
         const response = await deleteUserEntry(
@@ -169,10 +183,10 @@ describe("異常系", () => {
         );
 
         expect(response.statusCode).toBe(500);
-        expect(response.body).toEqual(JSON.stringify({ error: "USE-42" }));
+        expect(response.body).toEqual(JSON.stringify({ error: "USE-43" }));
     });
 
-    test("userTableの中に指定したIDが存在しない時、ステータスコード404とUSE-43を返す", async () => {
+    test("userTableの中に指定したIDが存在しない時、ステータスコード404とUSE-44を返す", async () => {
         testSetUp({
             isUserDBSetup: "notfound",
             isUserSukiDBSetup: "ok",
@@ -185,10 +199,10 @@ describe("異常系", () => {
         );
 
         expect(response.statusCode).toBe(404);
-        expect(response.body).toEqual(JSON.stringify({ error: "USE-43" }));
+        expect(response.body).toEqual(JSON.stringify({ error: "USE-44" }));
     });
 
-    test("userTableとの接続に失敗した時、ステータスコード500とUSE-44を返す", async () => {
+    test("userTableとの接続に失敗した時、ステータスコード500とUSE-45を返す", async () => {
         testSetUp({
             isUserDBSetup: "fail",
             isUserSukiDBSetup: "ok",
@@ -201,10 +215,10 @@ describe("異常系", () => {
         );
 
         expect(response.statusCode).toBe(500);
-        expect(response.body).toEqual(JSON.stringify({ error: "USE-44" }));
+        expect(response.body).toEqual(JSON.stringify({ error: "USE-45" }));
     });
 
-    test("userSukiTableの中に指定したIDが存在しない時、ステータスコード404とUSE-45を返す", async () => {
+    test("userSukiTableの中に指定したIDが存在しない時、ステータスコード404とUSE-46を返す", async () => {
         testSetUp({
             isUserDBSetup: "ok",
             isUserSukiDBSetup: "notfound",
@@ -217,10 +231,10 @@ describe("異常系", () => {
         );
 
         expect(response.statusCode).toBe(404);
-        expect(response.body).toEqual(JSON.stringify({ error: "USE-45" }));
+        expect(response.body).toEqual(JSON.stringify({ error: "USE-46" }));
     });
 
-    test("userSukiTableとの接続に失敗した時、ステータスコード500とUSE-46を返す", async () => {
+    test("userSukiTableとの接続に失敗した時、ステータスコード500とUSE-47を返す", async () => {
         testSetUp({
             isUserDBSetup: "ok",
             isUserSukiDBSetup: "fail",
@@ -233,6 +247,6 @@ describe("異常系", () => {
         );
 
         expect(response.statusCode).toBe(500);
-        expect(response.body).toEqual(JSON.stringify({ error: "USE-46" }));
+        expect(response.body).toEqual(JSON.stringify({ error: "USE-47" }));
     });
 });
