@@ -1,3 +1,4 @@
+export * from "@/@types/DeleteUserCorePayload";
 export * from "@/@types/FollowCoreResponse";
 export * from "@/@types/EmojiString";
 export * from "@/@types/ErrorCode";

@@ -56,6 +56,7 @@ provider:
     POST_FOLLOW_LAMBDA_NAME: ${env:POST_FOLLOW_LAMBDA_NAME}
     DELETE_FOLLOW_LAMBDA_NAME: ${env:DELETE_FOLLOW_LAMBDA_NAME}
     DELETE_EMOTE_LAMBDA_NAME: ${env:DELETE_EMOTE_LAMBDA_NAME}
+    DELETE_USER_LAMBDA_NAME: ${env:DELETE_USER_LAMBDA_NAME}
   # 初回実行時はコメントアウトする
   apiName: wordless-backend-rest-api-${sls:stage}
 

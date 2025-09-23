@@ -19,6 +19,7 @@ export const envConfig = {
     POST_FOLLOW_LAMBDA_NAME: process.env.POST_FOLLOW_LAMBDA_NAME,
     DELETE_FOLLOW_LAMBDA_NAME: process.env.DELETE_FOLLOW_LAMBDA_NAME,
     DELETE_EMOTE_LAMBDA_NAME: process.env.DELETE_EMOTE_LAMBDA_NAME,
+    DELETE_USER_LAMBDA_NAME: process.env.DELETE_USER_LAMBDA_NAME,
 };
 
 export const dbConfig = {
