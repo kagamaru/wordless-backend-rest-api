@@ -4,7 +4,7 @@ import { getLambdaClient } from "@/utility";
 export const invokeLambda = async <T>(
     functionName: string,
     payload: Record<string, any>,
-): Promise<T | "lambdaInvokeError"> => {
+): Promise<T | "success" | "lambdaInvokeError"> => {
     const lambdaClient = getLambdaClient();
     const invokeCommand = new InvokeCommand({
         FunctionName: functionName,
@@ -19,6 +19,10 @@ export const invokeLambda = async <T>(
         if (lambdaResponseString === "lambdaError") {
             console.error("lambdaError");
             return "lambdaInvokeError";
+        }
+
+        if (lambdaResponseString === "success") {
+            return "success";
         }
 
         const lambdaResponseJson = JSON.parse(lambdaResponseString) as T;
