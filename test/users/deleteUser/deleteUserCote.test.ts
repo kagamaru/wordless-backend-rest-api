@@ -1,4 +1,4 @@
-import { deleteUserCore } from "@/app/users/deleteUserCore";
+import { deleteUserCore } from "@/app/users/deleteUser/deleteUserCore";
 
 let deleteUserQueryMock: jest.Mock<any, any, any>;
 

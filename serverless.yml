@@ -65,6 +65,31 @@ functions:
     handler: app/auth/verifyToken.verifyToken
   verifyTokenAndGetUserSub:
     handler: app/auth/verifyTokenAndGetUserSub.verifyTokenAndGetUserSub
+  deleteUserEntry:
+    handler: app/users/deleteUser/deleteUserEntry.deleteUserEntry
+    events:
+      - http:
+          path: users/{userId}
+          method: delete
+          cors:
+            origin: ${env:FRONTEND_URL}
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Requested-With
+            methods:
+              - DELETE
+              - OPTIONS
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId: ${env:COGNITO_AUTHORIZER_ID}
+  deleteUserCore:
+    handler: app/users/deleteUser/deleteUserCore.deleteUserCore
+    vpc:
+      securityGroupIds: ${self:custom.security-group-id.${sls:stage}}
+      subnetIds: ${self:custom.vpc_subnet_id.${sls:stage}}
   getUserHandler:
     handler: app/users/findUser.findUser
     events:
