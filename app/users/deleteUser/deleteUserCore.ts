@@ -8,8 +8,12 @@ export const deleteUserCore = async ({
 }: DeleteUserCorePayload): Promise<"success" | "lambdaError"> => {
     try {
         await mysqlClient.query(
-            "UPDATE wordlessdb.users_table SET is_deleted = 1 WHERE userId = ?",
+            "UPDATE wordlessdb.emote_table SET is_deleted = 1 WHERE user_id = ?",
             [userId],
+        );
+        await mysqlClient.query(
+            "DELETE FROM wordlessdb.follow_table WHERE follower_id = ? OR followee_id = ?",
+            [userId, userId],
         );
         return "success";
     } catch (e) {
