@@ -22,7 +22,15 @@ beforeEach(() => {
 });
 
 describe("正常系", () => {
-    test("@aが@yをフォロー解除するQueryが実行される", async () => {
+    test("successを返す", async () => {
+        const response = await deleteUserCore({
+            userId: "@a",
+        });
+
+        expect(response).toEqual("success");
+    });
+
+    test("ユーザーを削除するQueryが実行される", async () => {
         await deleteUserCore({
             userId: "@a",
         });
