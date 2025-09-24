@@ -23,20 +23,24 @@ const testSetUp = (setUp: {
         }),
     });
 
-    if (setUp.isLambdaSetup === "valid") {
+    const setLambdaResponse = (response: string): void => {
         lambdaMock.resolves({
             Payload: new Uint8ArrayBlobAdapter(
-                new TextEncoder().encode("valid"),
+                new TextEncoder().encode(response),
             ),
         });
-    } else if (setUp.isLambdaSetup === "invalid") {
-        lambdaMock.resolves({
-            Payload: new Uint8ArrayBlobAdapter(
-                new TextEncoder().encode("invalid"),
-            ),
-        });
-    } else if (setUp.isLambdaSetup === "error") {
-        lambdaMock.rejects(new Error());
+    };
+
+    switch (setUp.isLambdaSetup) {
+        case "valid":
+            setLambdaResponse("valid");
+            break;
+        case "invalid":
+            setLambdaResponse("invalid");
+            break;
+        case "error":
+            lambdaMock.rejects(new Error());
+            break;
     }
 };
 

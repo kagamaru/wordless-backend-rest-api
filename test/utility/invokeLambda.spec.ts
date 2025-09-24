@@ -14,42 +14,29 @@ const testSetUp = (setUp: {
         Payload: JSON.stringify({}),
     });
 
-    if (setUp.isLambdaSetup === "success") {
+    const setLambdaResponse = (response: string): void => {
         lambdaMock.resolves({
             Payload: new Uint8ArrayBlobAdapter(
-                new TextEncoder().encode("success"),
+                new TextEncoder().encode(response),
             ),
         });
-    } else if (setUp.isLambdaSetup === "jsonResponse") {
-        lambdaMock.resolves({
-            Payload: new Uint8ArrayBlobAdapter(
-                new TextEncoder().encode(
-                    JSON.stringify({
-                        message: "jsonResponse",
-                    }),
-                ),
-            ),
-        });
-    } else if (setUp.isLambdaSetup === "lambdaError") {
-        lambdaMock.resolves({
-            Payload: new Uint8ArrayBlobAdapter(
-                new TextEncoder().encode("lambdaError"),
-            ),
-        });
-    } else if (setUp.isLambdaSetup === "invalidJson") {
-        lambdaMock.resolves({
-            Payload: new Uint8ArrayBlobAdapter(
-                new TextEncoder().encode("invalidJson"),
-            ),
-        });
+    };
+
+    switch (setUp.isLambdaSetup) {
+        case "success":
+            setLambdaResponse("success");
+            break;
+        case "jsonResponse":
+            setLambdaResponse(JSON.stringify({ message: "jsonResponse" }));
+            break;
+        case "lambdaError":
+            setLambdaResponse("lambdaError");
+            break;
+        case "invalidJson":
+            setLambdaResponse("invalidJson");
+            break;
     }
 };
-
-beforeEach(() => {
-    testSetUp({
-        isLambdaSetup: "success",
-    });
-});
 
 describe("invokeLambda", () => {
     test("Lambdaがsuccessを返した時、successを返す", async () => {
