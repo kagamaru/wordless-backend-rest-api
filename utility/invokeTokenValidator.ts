@@ -23,8 +23,9 @@ export const invokeTokenValidator = async (
     }
 
     try {
-        const result = payload.transformToString(); // NOTE: invalid or valid
-        return result as "valid" | "invalid";
+        // NOTE: { result: "valid" | "invalid" } の形式で返却
+        const result = JSON.parse(payload.transformToString());
+        return result.result;
     } catch (error) {
         console.error(error);
         return "invalid";
