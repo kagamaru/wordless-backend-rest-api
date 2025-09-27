@@ -7,7 +7,7 @@ import {
     invokeTokenValidator,
     putToDynamoDB,
 } from "@/utility";
-import { PostUserSukiPayload } from "@/@types";
+import { EmojiString, PostUserSukiPayload } from "@/@types";
 import { emojiIds } from "@/static/emojiIds";
 
 export const postUserSuki = async (
@@ -107,15 +107,17 @@ export const postUserSuki = async (
         );
     }
 
+    let userSuki = [
+        userSukiEmoji1,
+        userSukiEmoji2,
+        userSukiEmoji3,
+        userSukiEmoji4,
+    ].filter((emoji) => emoji);
+
     try {
         await putToDynamoDB(envConfig.USER_SUKI_TABLE, {
             userId: pathParameterUserId,
-            userSuki: [
-                userSukiEmoji1,
-                userSukiEmoji2,
-                userSukiEmoji3,
-                userSukiEmoji4,
-            ],
+            userSuki,
         });
     } catch (error) {
         console.error(error);
@@ -128,32 +130,5 @@ export const postUserSuki = async (
         );
     }
 
-    try {
-        const { userSuki } = await getItemFromDynamoDB(
-            envConfig.USER_SUKI_TABLE,
-            {
-                userId: pathParameterUserId,
-            },
-        );
-        return createResponse({ userSuki }, originName);
-    } catch (error) {
-        console.error(error);
-        if (error.message === "Cannot find item") {
-            return createErrorResponse(
-                404,
-                {
-                    error: "USK-15",
-                },
-                originName,
-            );
-        }
-
-        return createErrorResponse(
-            500,
-            {
-                error: "USK-16",
-            },
-            originName,
-        );
-    }
+    return createResponse({ userSuki }, originName);
 };

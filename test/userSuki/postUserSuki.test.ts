@@ -38,7 +38,6 @@ jest.mock("@/utility", () => {
 const testSetUp = (setUpDB: {
     isUsersDBGetSetup: "ok" | "notfound" | "fail";
     isUserSukiDBPostSetup: "ok" | "fail";
-    isUserSukiDBGetSetup: "ok" | "returnEmptyArray" | "fail" | "notfound";
 }): void => {
     const usersDdbGetMock = ddbMock.on(GetCommand, {
         TableName: userTableName,
@@ -51,12 +50,6 @@ const testSetUp = (setUpDB: {
         Item: {
             userId: "@fuga_fuga",
             userSuki: [":rat:", ":cow:", ":tiger:", ":rabbit:"],
-        },
-    });
-    const userSukiDdbGetMock = ddbMock.on(GetCommand, {
-        TableName: userSukiTableName,
-        Key: {
-            userId: "@fuga_fuga",
         },
     });
 
@@ -79,18 +72,6 @@ const testSetUp = (setUpDB: {
     } else {
         userSukiDdbPostMock.rejects(new Error());
     }
-
-    if (setUpDB.isUserSukiDBGetSetup === "ok") {
-        userSukiDdbGetMock.resolves(item);
-    } else if (setUpDB.isUserSukiDBGetSetup === "returnEmptyArray") {
-        userSukiDdbGetMock.resolves({
-            Item: { userId: "@fuga_fuga", userSuki: [] },
-        });
-    } else if (setUpDB.isUserSukiDBGetSetup === "notfound") {
-        userSukiDdbGetMock.resolves({ Item: null });
-    } else {
-        userSukiDdbGetMock.rejects(new Error());
-    }
 };
 
 beforeEach(() => {
@@ -103,7 +84,6 @@ describe("正常系", () => {
         testSetUp({
             isUsersDBGetSetup: "ok",
             isUserSukiDBPostSetup: "ok",
-            isUserSukiDBGetSetup: "ok",
         });
 
         const response = await postUserSuki(
@@ -122,8 +102,8 @@ describe("正常系", () => {
         expect(response.body).toEqual(
             JSON.stringify({
                 userSuki: [
-                    "snake",
-                    "dog",
+                    ":snake:",
+                    ":dog:",
                     ":arrived:",
                     ":neko_meme_screaming_cat:",
                 ],
@@ -135,7 +115,6 @@ describe("正常系", () => {
         testSetUp({
             isUsersDBGetSetup: "ok",
             isUserSukiDBPostSetup: "ok",
-            isUserSukiDBGetSetup: "returnEmptyArray",
         });
 
         const response = await postUserSuki(
@@ -160,7 +139,6 @@ describe("異常系", () => {
         testSetUp({
             isUsersDBGetSetup: "ok",
             isUserSukiDBPostSetup: "ok",
-            isUserSukiDBGetSetup: "ok",
         });
 
         const response = await postUserSuki(getHandlerRequest({}));
@@ -177,7 +155,6 @@ describe("異常系", () => {
         testSetUp({
             isUsersDBGetSetup: "ok",
             isUserSukiDBPostSetup: "ok",
-            isUserSukiDBGetSetup: "ok",
         });
 
         const response = await postUserSuki(
@@ -198,7 +175,6 @@ describe("異常系", () => {
         testSetUp({
             isUsersDBGetSetup: "ok",
             isUserSukiDBPostSetup: "ok",
-            isUserSukiDBGetSetup: "ok",
         });
 
         const response = await postUserSuki(
@@ -241,7 +217,6 @@ describe("異常系", () => {
             testSetUp({
                 isUsersDBGetSetup: "ok",
                 isUserSukiDBPostSetup: "ok",
-                isUserSukiDBGetSetup: "ok",
             });
 
             const response = await postUserSuki(
@@ -285,7 +260,6 @@ describe("異常系", () => {
             testSetUp({
                 isUsersDBGetSetup: "ok",
                 isUserSukiDBPostSetup: "ok",
-                isUserSukiDBGetSetup: "ok",
             });
 
             const response = await postUserSuki(
@@ -309,7 +283,6 @@ describe("異常系", () => {
         testSetUp({
             isUsersDBGetSetup: "ok",
             isUserSukiDBPostSetup: "ok",
-            isUserSukiDBGetSetup: "ok",
         });
 
         const response = await postUserSuki(
@@ -336,7 +309,6 @@ describe("異常系", () => {
         testSetUp({
             isUsersDBGetSetup: "notfound",
             isUserSukiDBPostSetup: "ok",
-            isUserSukiDBGetSetup: "ok",
         });
 
         const response = await postUserSuki(
@@ -363,7 +335,6 @@ describe("異常系", () => {
         testSetUp({
             isUsersDBGetSetup: "fail",
             isUserSukiDBPostSetup: "ok",
-            isUserSukiDBGetSetup: "ok",
         });
 
         const response = await postUserSuki(
@@ -390,7 +361,6 @@ describe("異常系", () => {
         testSetUp({
             isUsersDBGetSetup: "ok",
             isUserSukiDBPostSetup: "fail",
-            isUserSukiDBGetSetup: "ok",
         });
 
         const response = await postUserSuki(
@@ -409,60 +379,6 @@ describe("異常系", () => {
         expect(response.body).toEqual(
             JSON.stringify({
                 error: "USK-14",
-            }),
-        );
-    });
-
-    test("ユーザーの好きな絵文字を取得する時、指定されたユーザーIDのユーザーが存在しなかった時、USK-15と404エラーを返す（ほぼありえない）", async () => {
-        testSetUp({
-            isUsersDBGetSetup: "ok",
-            isUserSukiDBPostSetup: "ok",
-            isUserSukiDBGetSetup: "notfound",
-        });
-
-        const response = await postUserSuki(
-            getHandlerRequest({
-                pathParameters: { userId: "@fuga_fuga" },
-                body: JSON.stringify({
-                    userSukiEmoji1: ":rat:",
-                    userSukiEmoji2: ":cow:",
-                    userSukiEmoji3: ":tiger:",
-                    userSukiEmoji4: ":rabbit:",
-                }),
-            }),
-        );
-
-        expect(response.statusCode).toBe(404);
-        expect(response.body).toEqual(
-            JSON.stringify({
-                error: "USK-15",
-            }),
-        );
-    });
-
-    test("ユーザーの好きな絵文字を取得する時、ユーザースキテーブルと接続できなかった場合、USK-16と500エラーを返す", async () => {
-        testSetUp({
-            isUsersDBGetSetup: "ok",
-            isUserSukiDBPostSetup: "ok",
-            isUserSukiDBGetSetup: "fail",
-        });
-
-        const response = await postUserSuki(
-            getHandlerRequest({
-                pathParameters: { userId: "@fuga_fuga" },
-                body: JSON.stringify({
-                    userSukiEmoji1: ":rat:",
-                    userSukiEmoji2: ":cow:",
-                    userSukiEmoji3: ":tiger:",
-                    userSukiEmoji4: ":rabbit:",
-                }),
-            }),
-        );
-
-        expect(response.statusCode).toBe(500);
-        expect(response.body).toEqual(
-            JSON.stringify({
-                error: "USK-16",
             }),
         );
     });
