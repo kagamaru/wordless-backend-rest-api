@@ -8,10 +8,10 @@ import {
 
 const handleErrorResponse = (errorCode: string, originName: string) => {
     const errorMap = {
-        "USE-12": 404,
-        "USE-13": 500,
-        "USE-14": 404,
-        "USE-15": 500,
+        "USB-02": 404,
+        "USB-03": 500,
+        "USB-04": 404,
+        "USB-05": 500,
     };
     return createErrorResponse(
         errorMap[errorCode],
@@ -28,7 +28,7 @@ export const findUserSub = async (
         return createErrorResponse(
             400,
             {
-                error: "USE-11",
+                error: "USB-01",
             },
             originName,
         );
@@ -46,7 +46,7 @@ export const findUserSub = async (
     } catch (error) {
         console.error(error);
         return handleErrorResponse(
-            error.message === "Cannot find item" ? "USE-12" : "USE-13",
+            error.message === "Cannot find item" ? "USB-02" : "USB-03",
             originName,
         );
     }
@@ -61,7 +61,7 @@ export const findUserSub = async (
     } catch (error) {
         console.error(error);
         return handleErrorResponse(
-            error.message === "Cannot find item" ? "USE-14" : "USE-15",
+            error.message === "Cannot find item" ? "USB-04" : "USB-05",
             originName,
         );
     }
