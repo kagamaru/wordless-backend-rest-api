@@ -121,13 +121,13 @@ const usersTableItemForB = {
 };
 
 const emoteReactionTableName = "emote-reaction-table-offline";
-const usersTableName = "users-table-offline";
+const userTableName = "user-table-offline";
 
 jest.mock("@/config", () => ({
     // HACK: 変数へのアクセスが不可のため、ハードコーディングする
     envConfig: {
         EMOTE_REACTION_TABLE: "emote-reaction-table-offline",
-        USERS_TABLE: "users-table-offline",
+        USER_TABLE: "user-table-offline",
     },
     dbConfig: {
         DB_HOST: "",
@@ -154,7 +154,7 @@ const testSetUp = (setUpDB: {
 }): void => {
     const [userDdbMockA, userDdbMockB] = ["@a", "@b"].map((userId) => {
         return ddbMock.on(GetCommand, {
-            TableName: usersTableName,
+            TableName: userTableName,
             Key: {
                 userId: userId,
             },

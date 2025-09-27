@@ -1,12 +1,12 @@
 import { mockClient } from "aws-sdk-client-mock";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
-import { findUserSub } from "@/app/users/findUserSub";
+import { findUserSub } from "@/app/userSub/findUserSub";
 import { getHandlerRequest } from "@/test/testutils/getHandlerRequest";
 
 const ddbMock = mockClient(DynamoDBDocumentClient);
 
 const userSubTableName = "user-sub-table-offline";
-const usersTableName = "users-table-offline";
+const userTableName = "user-table-offline";
 
 const userTableItem = {
     Item: {
@@ -27,7 +27,7 @@ jest.mock("@/config", () => ({
     // HACK: 変数へのアクセスが不可のため、ハードコーディングする
     envConfig: {
         USER_SUB_TABLE: "user-sub-table-offline",
-        USERS_TABLE: "users-table-offline",
+        USER_TABLE: "user-table-offline",
     },
 }));
 
@@ -40,7 +40,7 @@ const testSetUp = (setUpDB: {
     isUserSubDBSetup: "ok" | "fail" | "notfound";
 }): void => {
     const userDdbMock = ddbMock.on(GetCommand, {
-        TableName: usersTableName,
+        TableName: userTableName,
         Key: {
             userId: "@fuga_fuga",
         },

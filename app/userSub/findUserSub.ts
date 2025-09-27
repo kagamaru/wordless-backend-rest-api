@@ -53,7 +53,7 @@ export const findUserSub = async (
 
     try {
         const { userId, userName, userAvatarUrl } = await getItemFromDynamoDB(
-            envConfig.USERS_TABLE,
+            envConfig.USER_TABLE,
             { userId: userIdFetchedFromUserSub },
         );
 

@@ -46,7 +46,7 @@ export const postUser = async (
 
     try {
         await putToDynamoDB(
-            envConfig.USERS_TABLE,
+            envConfig.USER_TABLE,
             {
                 userId,
                 userName,

@@ -5,14 +5,14 @@ import { postFollowEntry } from "@/app/follow/post/postFollowEntry";
 
 const ddbMock = mockClient(DynamoDBDocumentClient);
 
-const usersTableName = "users-table-offline";
+const userTableName = "user-table-offline";
 
 jest.mock("@/config", () => {
     const actual = jest.requireActual("@/config");
     return {
         ...actual,
         envConfig: {
-            USERS_TABLE: "users-table-offline",
+            USER_TABLE: "user-table-offline",
         },
     };
 });
@@ -50,7 +50,7 @@ const testSetUp = (setUpDB: {
 }): void => {
     const [userDdbMockA, userDdbMockY] = ["@a", "@y"].map((userId) => {
         return ddbMock.on(GetCommand, {
-            TableName: usersTableName,
+            TableName: userTableName,
             Key: {
                 userId: userId,
             },

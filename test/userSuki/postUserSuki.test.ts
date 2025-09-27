@@ -8,7 +8,7 @@ import { postUserSuki } from "@/app/userSuki/postUserSuki";
 import { getHandlerRequest } from "@/test/testutils/getHandlerRequest";
 
 const ddbMock = mockClient(DynamoDBDocumentClient);
-const usersTableName = "users-table-offline";
+const userTableName = "user-table-offline";
 const userSukiTableName = "user-suki-table-offline";
 
 const item = {
@@ -22,7 +22,7 @@ jest.mock("@/config", () => ({
     // HACK: 変数へのアクセスが不可のため、ハードコーディングする
     envConfig: {
         USER_SUKI_TABLE: "user-suki-table-offline",
-        USERS_TABLE: "users-table-offline",
+        USER_TABLE: "user-table-offline",
     },
 }));
 
@@ -41,7 +41,7 @@ const testSetUp = (setUpDB: {
     isUserSukiDBGetSetup: "ok" | "returnEmptyArray" | "fail" | "notfound";
 }): void => {
     const usersDdbGetMock = ddbMock.on(GetCommand, {
-        TableName: usersTableName,
+        TableName: userTableName,
         Key: {
             userId: "@fuga_fuga",
         },

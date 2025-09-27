@@ -10,11 +10,11 @@ import { getHandlerRequest } from "@/test/testutils/getHandlerRequest";
 
 const ddbMock = mockClient(DynamoDBDocumentClient);
 let getSignedUrlMock: jest.Mock<any, any, any>;
-const usersTableName = "users-table-offline";
+const userTableName = "user-table-offline";
 
 jest.mock("@/config", () => ({
     envConfig: {
-        USERS_TABLE: "users-table-offline",
+        USER_TABLE: "user-table-offline",
         USER_IMAGE_BUCKET: "user-image-bucket-offline",
         CLOUDFRONT_USER_IMAGE_URL: "https://access-url.test",
     },
@@ -39,13 +39,13 @@ const testSetUp = (setUp: {
     isUserDBPostSetup: "ok" | "fail";
 }): void => {
     const userDdbFetchMock = ddbMock.on(GetCommand, {
-        TableName: usersTableName,
+        TableName: userTableName,
         Key: {
             userId: "@a",
         },
     });
     const userDdbPostMock = ddbMock.on(PutCommand, {
-        TableName: usersTableName,
+        TableName: userTableName,
         Item: {
             userId: "@a",
             userAvatarUrl:

@@ -1,6 +1,6 @@
 import { mockClient } from "aws-sdk-client-mock";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
-import { findUser } from "@/app/users/findUser";
+import { findUser } from "@/app/user/findUser";
 import { getHandlerRequest } from "@/test/testutils/getHandlerRequest";
 
 const ddbMock = mockClient(DynamoDBDocumentClient);
@@ -14,7 +14,7 @@ const item = {
 };
 
 beforeAll(() => {
-    process.env.USERS_TABLE = "users-table-offline";
+    process.env.USER_TABLE = "user-table-offline";
 });
 
 beforeEach(() => {

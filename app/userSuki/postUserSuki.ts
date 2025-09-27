@@ -84,7 +84,7 @@ export const postUserSuki = async (
     }
 
     try {
-        await getItemFromDynamoDB(envConfig.USERS_TABLE, {
+        await getItemFromDynamoDB(envConfig.USER_TABLE, {
             userId: pathParameterUserId,
         });
     } catch (error) {

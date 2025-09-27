@@ -1,4 +1,4 @@
-import { deleteEmoteCore } from "@/app/emote/deleteEmoteCore";
+import { deleteEmoteCore } from "@/app/emote/delete/deleteEmoteCore";
 
 let deleteEmoteQueryMock: jest.Mock<any, any, any>;
 let sqlCloseMock: jest.Mock<any, any, any>;

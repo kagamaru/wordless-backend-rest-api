@@ -44,7 +44,7 @@ export const deleteUserEntry = async (
 
     try {
         await putToDynamoDB(
-            envConfig.USERS_TABLE,
+            envConfig.USER_TABLE,
             {
                 userId,
                 userName: "削除済みユーザー",

@@ -1,5 +1,5 @@
 import { getHandlerRequest } from "@/test/testutils/getHandlerRequest";
-import { deleteEmoteEntry } from "@/app/emote/deleteEmoteEntry";
+import { deleteEmoteEntry } from "@/app/emote/delete/deleteEmoteEntry";
 
 jest.mock("@/config", () => {
     const actual = jest.requireActual("@/config");

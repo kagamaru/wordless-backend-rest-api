@@ -23,7 +23,7 @@ provider:
             - s3:GetObject
             - lambda:InvokeFunction            
           Resource:
-            - Fn::GetAtt: [UsersTable, Arn]
+            - Fn::GetAtt: [UserTable, Arn]
             - Fn::GetAtt: [EmoteReactionTable, Arn]
             - Fn::GetAtt: [UserSubTable, Arn]
             - Fn::GetAtt: [UserSukiTable, Arn]
@@ -36,7 +36,7 @@ provider:
             - arn:aws:lambda:${env:MY_AWS_REGION}:${aws:accountId}:function:${env:DELETE_USER_LAMBDA_NAME}
   environment:
     EMOTE_REACTION_TABLE: emote-reaction-table-${sls:stage}
-    USERS_TABLE: users-table-${sls:stage}
+    USER_TABLE: user-table-${sls:stage}
     USER_SUB_TABLE: user-sub-table-${sls:stage}
     USER_SUKI_TABLE: user-suki-table-${sls:stage}
     DEPLOY_ENV: ${sls:stage}
@@ -66,10 +66,10 @@ functions:
   verifyTokenAndGetUserSub:
     handler: app/auth/verifyTokenAndGetUserSub.verifyTokenAndGetUserSub
   deleteUserEntry:
-    handler: app/users/deleteUser/deleteUserEntry.deleteUserEntry
+    handler: app/user/delete/deleteUserEntry.deleteUserEntry
     events:
       - http:
-          path: users/{userId}
+          path: user/{userId}
           method: delete
           cors:
             origin: ${env:FRONTEND_URL}
@@ -86,15 +86,15 @@ functions:
             type: COGNITO_USER_POOLS
             authorizerId: ${env:COGNITO_AUTHORIZER_ID}
   deleteUserCore:
-    handler: app/users/deleteUser/deleteUserCore.deleteUserCore
+    handler: app/user/delete/deleteUserCore.deleteUserCore
     vpc:
       securityGroupIds: ${self:custom.security-group-id.${sls:stage}}
       subnetIds: ${self:custom.vpc_subnet_id.${sls:stage}}
   getUserHandler:
-    handler: app/users/findUser.findUser
+    handler: app/user/findUser.findUser
     events:
       - http:
-          path: users/{userId}
+          path: user/{userId}
           method: get
           cors:
             origin: ${env:FRONTEND_URL}
@@ -111,10 +111,10 @@ functions:
             type: COGNITO_USER_POOLS
             authorizerId: ${env:COGNITO_AUTHORIZER_ID}
   postUser:
-    handler: app/users/postUser.postUser
+    handler: app/user/postUser.postUser
     events:
       - http:
-          path: users/{userId}
+          path: user/{userId}
           method: post
           cors:
             origin: ${env:FRONTEND_URL}
@@ -131,10 +131,10 @@ functions:
             type: COGNITO_USER_POOLS
             authorizerId: ${env:COGNITO_AUTHORIZER_ID}
   findUserSub:
-    handler: app/users/findUserSub.findUserSub
+    handler: app/userSub/findUserSub.findUserSub
     events:
       - http:
-          path: users/sub/{userSub}
+          path: userSub/{userSub}
           method: get
           cors:
             origin: ${env:FRONTEND_URL}
@@ -151,10 +151,10 @@ functions:
             type: COGNITO_USER_POOLS
             authorizerId: ${env:COGNITO_AUTHORIZER_ID}
   postUserName:
-    handler: app/users/postUserName.postUserName
+    handler: app/user/userName/postUserName.postUserName
     events:
       - http:
-          path: users/{userId}/name
+          path: user/{userId}/userName
           method: post
           cors:
             origin: ${env:FRONTEND_URL}
@@ -211,7 +211,7 @@ functions:
             type: COGNITO_USER_POOLS
             authorizerId: ${env:COGNITO_AUTHORIZER_ID}
   deleteEmoteEntry:
-    handler: app/emote/deleteEmoteEntry.deleteEmoteEntry
+    handler: app/emote/delete/deleteEmoteEntry.deleteEmoteEntry
     events:
       - http:
           path: emote/{emoteId}
@@ -231,7 +231,7 @@ functions:
             type: COGNITO_USER_POOLS
             authorizerId: ${env:COGNITO_AUTHORIZER_ID}
   deleteEmoteCore:
-    handler: app/emote/deleteEmoteCore.deleteEmoteCore
+    handler: app/emote/delete/deleteEmoteCore.deleteEmoteCore
     vpc:
       securityGroupIds: ${self:custom.security-group-id.${sls:stage}}
       subnetIds: ${self:custom.vpc_subnet_id.${sls:stage}}
@@ -365,7 +365,7 @@ resources:
         IdentitySource: method.request.header.Authorization
         ProviderARNs:
           - ${env:COGNITO_USER_POOL_ARN}
-    UsersTable:
+    UserTable:
       Type: AWS::DynamoDB::Table
       Properties:
         AttributeDefinitions:
@@ -375,7 +375,7 @@ resources:
           - AttributeName: userId
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
-        TableName: users-table-${sls:stage}
+        TableName: user-table-${sls:stage}
     UserSubTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -442,8 +442,8 @@ custom:
     seed:
       dev:
         sources:
-          - table: users-table-offline
-            sources: [./seed/users-table-offline.json]
+          - table: user-table-offline
+            sources: [./seed/user-table-offline.json]
           - table: emote-reaction-table-offline
             sources: [./seed/emote-reaction-table-offline.json]
           - table: user-sub-table-offline
