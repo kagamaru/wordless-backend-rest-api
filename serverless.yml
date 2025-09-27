@@ -45,7 +45,6 @@ provider:
     DB_PASSWORD: ${env:DB_PASSWORD}
     DB_NAME: ${env:DB_NAME}
     FRONTEND_URL: ${self:custom.frontend-url.${sls:stage}}
-    ALLOW_ORIGIN: ${self:custom.frontend-url.offline}
     COGNITO_AUTHORIZER_ID: ${env:COGNITO_AUTHORIZER_ID}
     MY_AWS_REGION: ${env:MY_AWS_REGION}
     USER_IMAGE_BUCKET: ${env:USER_IMAGE_BUCKET}
@@ -426,7 +425,7 @@ custom:
     prod: ${env:VPC_SUBNET_ID}
   frontend-url:
     offline: http://localhost:3000
-    dev: https://develop.d2k4f3iskqkv6l.amplifyapp.com
+    dev: http://localhost:3000
     prod: https://main.d2k4f3iskqkv6l.amplifyapp.com
   serverless-dynamodb:
     stages:
