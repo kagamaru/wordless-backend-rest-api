@@ -18,10 +18,7 @@ export function createErrorResponse(
         statusCode,
         body: JSON.stringify(responseBody),
         headers: {
-            "Access-Control-Allow-Origin":
-                originName === envConfig.ALLOW_ORIGIN
-                    ? envConfig.ALLOW_ORIGIN
-                    : envConfig.FRONTEND_URL,
+            "Access-Control-Allow-Origin": envConfig.FRONTEND_URL,
             "Access-Control-Allow-Headers": "Content-Type",
             "Access-Control-Allow-Methods": "OPTIONS, POST, GET",
         },
