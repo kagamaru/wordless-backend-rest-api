@@ -3,9 +3,9 @@ import { envConfig } from "@/config";
 import { UserSubInfo } from "@/@types";
 import { getCognitoJwtVerifier, getItemFromDynamoDB } from "@/utility";
 
-const handleError = (error: unknown): "invalid" => {
+const handleError = (error: unknown): { result: "invalid" } => {
     console.error(error);
-    return "invalid";
+    return { result: "invalid" };
 };
 
 export const verifyToken = async ({
@@ -14,7 +14,7 @@ export const verifyToken = async ({
 }: {
     authHeader: string;
     userId: string;
-}): Promise<"valid" | "invalid"> => {
+}): Promise<{ result: "valid" | "invalid" }> => {
     let token: string;
     try {
         token = authHeader.split(" ")[1];
@@ -40,5 +40,5 @@ export const verifyToken = async ({
         return handleError(error);
     }
 
-    return userSubInfo.userId === userId ? "valid" : "invalid";
+    return { result: userSubInfo.userId === userId ? "valid" : "invalid" };
 };

@@ -33,10 +33,10 @@ const testSetUp = (setUp: {
 
     switch (setUp.isLambdaSetup) {
         case "valid":
-            setLambdaResponse("valid");
+            setLambdaResponse(JSON.stringify({ result: "valid" }));
             break;
         case "invalid":
-            setLambdaResponse("invalid");
+            setLambdaResponse(JSON.stringify({ result: "invalid" }));
             break;
         case "error":
             lambdaMock.rejects(new Error());
