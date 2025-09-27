@@ -67,7 +67,7 @@ describe("正常系", () => {
             userId,
         });
 
-        expect(response).toBe("valid");
+        expect(response).toEqual({ result: "valid" });
     });
 });
 
@@ -80,7 +80,7 @@ describe("異常系", () => {
             userId,
         });
 
-        expect(response).toBe("invalid");
+        expect(response).toEqual({ result: "invalid" });
     });
 
     test("tokenが無効な場合、invalidを返す", async () => {
@@ -92,7 +92,7 @@ describe("異常系", () => {
             userId,
         });
 
-        expect(response).toBe("invalid");
+        expect(response).toEqual({ result: "invalid" });
     });
 
     test("userSubが存在しない場合、invalidを返す", async () => {
@@ -103,7 +103,7 @@ describe("異常系", () => {
             userId: "@invalid_user",
         });
 
-        expect(response).toBe("invalid");
+        expect(response).toEqual({ result: "invalid" });
     });
 
     test("userSub取得時、エラーが発生した場合、invalidを返す", async () => {
@@ -114,6 +114,6 @@ describe("異常系", () => {
             userId,
         });
 
-        expect(response).toBe("invalid");
+        expect(response).toEqual({ result: "invalid" });
     });
 });
