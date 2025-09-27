@@ -93,7 +93,7 @@ describe("異常系", () => {
         expect(response.statusCode).toBe(400);
         expect(response.body).toEqual(
             JSON.stringify({
-                error: "USE-11",
+                error: "USB-01",
             }),
         );
     });
@@ -110,7 +110,7 @@ describe("異常系", () => {
         expect(response.statusCode).toBe(400);
         expect(response.body).toEqual(
             JSON.stringify({
-                error: "USE-11",
+                error: "USB-01",
             }),
         );
     });
@@ -125,7 +125,7 @@ describe("異常系", () => {
         expect(response.statusCode).toBe(404);
         expect(response.body).toEqual(
             JSON.stringify({
-                error: "USE-12",
+                error: "USB-02",
             }),
         );
     });
@@ -140,7 +140,7 @@ describe("異常系", () => {
         );
 
         expect(response.statusCode).toBe(500);
-        expect(response.body).toEqual(JSON.stringify({ error: "USE-13" }));
+        expect(response.body).toEqual(JSON.stringify({ error: "USB-03" }));
     });
 
     test("UserSubTableから取得したuserIdに該当するユーザーがUserTableに存在しない時、USE-14と404エラーを返す", async () => {
@@ -151,7 +151,7 @@ describe("異常系", () => {
         );
 
         expect(response.statusCode).toBe(404);
-        expect(response.body).toEqual(JSON.stringify({ error: "USE-14" }));
+        expect(response.body).toEqual(JSON.stringify({ error: "USB-04" }));
     });
 
     test("UserTableとの接続に失敗したとき、USE-15と500エラーを返す", async () => {
@@ -162,6 +162,6 @@ describe("異常系", () => {
         );
 
         expect(response.statusCode).toBe(500);
-        expect(response.body).toEqual(JSON.stringify({ error: "USE-15" }));
+        expect(response.body).toEqual(JSON.stringify({ error: "USB-05" }));
     });
 });
