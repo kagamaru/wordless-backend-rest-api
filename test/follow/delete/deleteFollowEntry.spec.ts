@@ -6,7 +6,7 @@ jest.mock("@/config", () => {
     return {
         ...actual,
         envConfig: {
-            USERS_TABLE: "users-table-offline",
+            USER_TABLE: "user-table-offline",
         },
     };
 });

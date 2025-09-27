@@ -106,12 +106,9 @@ export const fetchEmotes = async (
             >;
 
         try {
-            userInfo = await getItemFromDynamoDB<string>(
-                envConfig.USERS_TABLE,
-                {
-                    userId: emote.user_id,
-                },
-            );
+            userInfo = await getItemFromDynamoDB<string>(envConfig.USER_TABLE, {
+                userId: emote.user_id,
+            });
         } catch (error) {
             console.error(error);
             return createErrorResponse(

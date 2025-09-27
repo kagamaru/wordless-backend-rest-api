@@ -1,11 +1,11 @@
 import { ConditionalCheckFailedException } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { mockClient } from "aws-sdk-client-mock";
-import { deleteUserEntry } from "@/app/users/deleteUser/deleteUserEntry";
+import { deleteUserEntry } from "@/app/user/delete/deleteUserEntry";
 import { getHandlerRequest } from "@/test/testutils/getHandlerRequest";
 
 const ddbMock = mockClient(DynamoDBDocumentClient);
-const usersTableName = "users-table-offline";
+const userTableName = "user-table-offline";
 const userSukiTableName = "user-suki-table-offline";
 
 jest.mock("@/config", () => {
@@ -13,7 +13,7 @@ jest.mock("@/config", () => {
     return {
         ...actual,
         envConfig: {
-            USERS_TABLE: "users-table-offline",
+            USER_TABLE: "user-table-offline",
             USER_SUKI_TABLE: "user-suki-table-offline",
             DELETE_USER_LAMBDA_NAME: "delete-user-lambda-offline",
         },
@@ -36,7 +36,7 @@ const testSetUp = (setUp: {
     isUserSukiDBSetup: "ok" | "fail" | "notfound";
 }): void => {
     const userDdbMock = ddbMock.on(PutCommand, {
-        TableName: usersTableName,
+        TableName: userTableName,
     });
     const userSukiDdbMock = ddbMock.on(PutCommand, {
         TableName: userSukiTableName,

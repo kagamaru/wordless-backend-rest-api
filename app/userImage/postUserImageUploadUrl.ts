@@ -96,7 +96,7 @@ export const postUserImageUploadUrl = async (
 
     let fetchedUserName: string;
     try {
-        const { userName } = await getItemFromDynamoDB(envConfig.USERS_TABLE, {
+        const { userName } = await getItemFromDynamoDB(envConfig.USER_TABLE, {
             userId,
         });
         fetchedUserName = userName as string;
@@ -121,7 +121,7 @@ export const postUserImageUploadUrl = async (
     }
 
     try {
-        await putToDynamoDB(envConfig.USERS_TABLE, {
+        await putToDynamoDB(envConfig.USER_TABLE, {
             userId,
             userAvatarUrl: publicUrl,
             userName: fetchedUserName,

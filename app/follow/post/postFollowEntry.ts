@@ -66,8 +66,8 @@ export const postFollowEntry = async (
     }
 
     const dynamoPromises = [
-        getItemFromDynamoDB(envConfig.USERS_TABLE, { userId: followerId }),
-        getItemFromDynamoDB(envConfig.USERS_TABLE, { userId: followeeId }),
+        getItemFromDynamoDB(envConfig.USER_TABLE, { userId: followerId }),
+        getItemFromDynamoDB(envConfig.USER_TABLE, { userId: followeeId }),
     ];
 
     // NOTE: フォローされるユーザーが存在しない場合、エラーを返す

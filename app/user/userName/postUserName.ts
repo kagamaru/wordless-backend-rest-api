@@ -52,7 +52,7 @@ export const postUserName = async (
 
     let userItem: User;
     try {
-        userItem = (await getItemFromDynamoDB(envConfig.USERS_TABLE, {
+        userItem = (await getItemFromDynamoDB(envConfig.USER_TABLE, {
             userId,
         })) as User;
     } catch (error) {
@@ -103,7 +103,7 @@ export const postUserName = async (
     }
 
     try {
-        await putToDynamoDB(envConfig.USERS_TABLE, {
+        await putToDynamoDB(envConfig.USER_TABLE, {
             userId,
             userName,
             userAvatarUrl: userItem.userAvatarUrl,

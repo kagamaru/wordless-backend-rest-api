@@ -3,7 +3,7 @@
 export const envConfig = {
     EMOTE_TABLE: process.env.EMOTE_TABLE,
     EMOTE_REACTION_TABLE: process.env.EMOTE_REACTION_TABLE,
-    USERS_TABLE: process.env.USERS_TABLE,
+    USER_TABLE: process.env.USER_TABLE,
     USER_SUB_TABLE: process.env.USER_SUB_TABLE,
     USER_SUKI_TABLE: process.env.USER_SUKI_TABLE,
     FRONTEND_URL: process.env.FRONTEND_URL,

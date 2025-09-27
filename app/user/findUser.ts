@@ -24,7 +24,7 @@ export const findUser = async (
 
     try {
         const { userId, userName, userAvatarUrl } = await getItemFromDynamoDB(
-            envConfig.USERS_TABLE,
+            envConfig.USER_TABLE,
             { userId: pathParameterUserId },
         );
 

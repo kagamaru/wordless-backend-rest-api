@@ -4,15 +4,15 @@ import {
     PutCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { mockClient } from "aws-sdk-client-mock";
-import { postUserName } from "@/app/users/postUserName";
+import { postUserName } from "@/app/user/userName/postUserName";
 import { getHandlerRequest } from "@/test/testutils/getHandlerRequest";
 
 const ddbMock = mockClient(DynamoDBDocumentClient);
-const usersTableName = "users-table-offline";
+const userTableName = "user-table-offline";
 
 jest.mock("@/config", () => ({
     envConfig: {
-        USERS_TABLE: "users-table-offline",
+        USER_TABLE: "user-table-offline",
     },
 }));
 
@@ -30,13 +30,13 @@ const testSetUp = (setUp: {
     isUserDBPostSetup: "ok" | "fail";
 }): void => {
     const userDdbFetchMock = ddbMock.on(GetCommand, {
-        TableName: usersTableName,
+        TableName: userTableName,
         Key: {
             userId: "@a",
         },
     });
     const userDdbPostMock = ddbMock.on(PutCommand, {
-        TableName: usersTableName,
+        TableName: userTableName,
         Item: {
             userId: "@a",
         },
