@@ -1068,7 +1068,7 @@ sequenceDiagram
 | USK-14       | 400        | requestBodyのuserSukiEmoji1, userSukiEmoji2, userSukiEmoji3, userSukiEmoji4が不正な形式 |
 | USK-15       | 400        | リクエストのuserIdがデータベースに存在しない                                            |
 | USK-16       | 400        | UserTableとの接続に失敗                                                                 |
-| USK-16       | 400        | UserSukiTableとの接続に失敗                                                             |
+| USK-17       | 400        | UserSukiTableとの接続に失敗                                                             |
 | AUN-99       | 400        | トークン検証で不正と判断                                                                |
 
 ## コンタクト
