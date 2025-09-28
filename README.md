@@ -1026,43 +1026,50 @@ sequenceDiagram
 
   FE->>FE: requestBodyをパース
   alt requestBodyのパースに失敗
-    FE-->>APIGW: 400, "USK-11"
+    FE-->>APIGW: 400, "USK-12"
     APIGW-->>Client: エラー応答
   end
 
   FE->>FE: userSukiEmoji1, userSukiEmoji2, userSukiEmoji3, userSukiEmoji4を取得
+  alt 絵文字の順序が不正
+    FE-->>APIGW: 400, "USK-13"
+    APIGW-->>Client: エラー応答
+  end
   alt userSukiEmoji1, userSukiEmoji2, userSukiEmoji3, userSukiEmoji4が不正な形式
-    FE-->>APIGW: 400, "USK-11"
+    FE-->>APIGW: 400, "USK-14"
     APIGW-->>Client: エラー応答
   end
 
   FE->>UDB: GetItem {userId}
   UDB-->>FE: ユーザー情報
   alt 該当のレコードがない
-    FE-->>APIGW: 404, "USK-12"
+    FE-->>APIGW: 404, "USK-15"
     APIGW-->>Client: エラー応答
   end
   alt ユーザー情報の取得に失敗
-    FE-->>APIGW: 500, "USK-13"
+    FE-->>APIGW: 500, "USK-16"
     APIGW-->>Client: エラー応答
   end
 
   FE->>USK: PutItem {userId, userSuki: [userSukiEmoji1, userSukiEmoji2, userSukiEmoji3, userSukiEmoji4]}
   alt ユーザースキの登録に失敗
-    FE-->>APIGW: 500, "USK-14"
+    FE-->>APIGW: 500, "USK-17"
     APIGW-->>Client: エラー応答
   end
 ```
 
 #### エラー一覧
 
-| エラーコード | ステータス | 条件                                         |
-| ------------ | ---------- | -------------------------------------------- |
-| USK-11       | 400        | リクエスト不正全般                           |
-| USK-12       | 400        | リクエストのuserIdがデータベースに存在しない |
-| USK-13       | 400        | UserTableとの接続に失敗                      |
-| USK-14       | 400        | UserSukiTableとの接続に失敗                  |
-| AUN-99       | 400        | トークン検証で不正と判断                     |
+| エラーコード | ステータス | 条件                                                                                    |
+| ------------ | ---------- | --------------------------------------------------------------------------------------- |
+| USK-11       | 400        | pathParametersないしはbodyが存在しない                                                  |
+| USK-12       | 400        | requestBodyのJSON変換に失敗                                                             |
+| USK-13       | 400        | 絵文字が空の絵文字入力（投稿終了）の後に指定された時                                    |
+| USK-14       | 400        | requestBodyのuserSukiEmoji1, userSukiEmoji2, userSukiEmoji3, userSukiEmoji4が不正な形式 |
+| USK-15       | 400        | リクエストのuserIdがデータベースに存在しない                                            |
+| USK-16       | 400        | UserTableとの接続に失敗                                                                 |
+| USK-16       | 400        | UserSukiTableとの接続に失敗                                                             |
+| AUN-99       | 400        | トークン検証で不正と判断                                                                |
 
 ## コンタクト
 

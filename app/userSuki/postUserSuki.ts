@@ -7,7 +7,7 @@ import {
     invokeTokenValidator,
     putToDynamoDB,
 } from "@/utility";
-import { EmojiString, PostUserSukiPayload } from "@/@types";
+import { PostUserSukiPayload } from "@/@types";
 import { emojiIds } from "@/static/emojiIds";
 
 export const postUserSuki = async (
@@ -41,7 +41,7 @@ export const postUserSuki = async (
         return createErrorResponse(
             400,
             {
-                error: "USK-11",
+                error: "USK-12",
             },
             originName,
         );
@@ -65,7 +65,7 @@ export const postUserSuki = async (
                 return createErrorResponse(
                     400,
                     {
-                        error: "USK-11",
+                        error: "USK-13",
                     },
                     originName,
                 );
@@ -75,7 +75,7 @@ export const postUserSuki = async (
                 return createErrorResponse(
                     400,
                     {
-                        error: "USK-11",
+                        error: "USK-14",
                     },
                     originName,
                 );
@@ -93,7 +93,7 @@ export const postUserSuki = async (
             return createErrorResponse(
                 404,
                 {
-                    error: "USK-12",
+                    error: "USK-15",
                 },
                 originName,
             );
@@ -101,7 +101,7 @@ export const postUserSuki = async (
         return createErrorResponse(
             500,
             {
-                error: "USK-13",
+                error: "USK-16",
             },
             originName,
         );
@@ -124,7 +124,7 @@ export const postUserSuki = async (
         return createErrorResponse(
             500,
             {
-                error: "USK-14",
+                error: "USK-17",
             },
             originName,
         );

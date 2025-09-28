@@ -11,13 +11,6 @@ const ddbMock = mockClient(DynamoDBDocumentClient);
 const userTableName = "user-table-offline";
 const userSukiTableName = "user-suki-table-offline";
 
-const item = {
-    Item: {
-        userId: "@fuga_fuga",
-        userSuki: ["snake", "dog", ":arrived:", ":neko_meme_screaming_cat:"],
-    },
-};
-
 jest.mock("@/config", () => ({
     // HACK: 変数へのアクセスが不可のため、ハードコーディングする
     envConfig: {
@@ -171,7 +164,7 @@ describe("異常系", () => {
         );
     });
 
-    test("リクエストのbodyがJSON形式でない時、USK-11と400エラーを返す", async () => {
+    test("リクエストのbodyがJSON形式でない時、USK-12と400エラーを返す", async () => {
         testSetUp({
             isUsersDBGetSetup: "ok",
             isUserSukiDBPostSetup: "ok",
@@ -187,7 +180,7 @@ describe("異常系", () => {
         expect(response.statusCode).toBe(400);
         expect(response.body).toEqual(
             JSON.stringify({
-                error: "USK-11",
+                error: "USK-12",
             }),
         );
     });
@@ -212,7 +205,7 @@ describe("異常系", () => {
             userSukiEmoji4: ":mock-invalid-emoji-id:",
         },
     ])(
-        "不正な絵文字IDが指定された時、ステータスコード400とUSK-11を返す",
+        "不正な絵文字IDが指定された時、ステータスコード400とUSK-14を返す",
         async (event) => {
             testSetUp({
                 isUsersDBGetSetup: "ok",
@@ -229,7 +222,7 @@ describe("異常系", () => {
             expect(response.statusCode).toBe(400);
             expect(response.body).toEqual(
                 JSON.stringify({
-                    error: "USK-11",
+                    error: "USK-14",
                 }),
             );
         },
@@ -255,7 +248,7 @@ describe("異常系", () => {
             userSukiEmoji4: ":rabbit:",
         },
     ])(
-        "空の絵文字入力（投稿終了）の後、絵文字が指定された時、ステータスコード400とUSK-11を返す",
+        "空の絵文字入力（投稿終了）の後、絵文字が指定された時、ステータスコード400とUSK-13を返す",
         async (event) => {
             testSetUp({
                 isUsersDBGetSetup: "ok",
@@ -272,7 +265,7 @@ describe("異常系", () => {
             expect(response.statusCode).toBe(400);
             expect(response.body).toEqual(
                 JSON.stringify({
-                    error: "USK-11",
+                    error: "USK-13",
                 }),
             );
         },
@@ -305,7 +298,7 @@ describe("異常系", () => {
         );
     });
 
-    test("指定されたuserIdに該当するユーザーが存在しない時、USK-12と404エラーを返す", async () => {
+    test("指定されたuserIdに該当するユーザーが存在しない時、USK-15と404エラーを返す", async () => {
         testSetUp({
             isUsersDBGetSetup: "notfound",
             isUserSukiDBPostSetup: "ok",
@@ -326,12 +319,12 @@ describe("異常系", () => {
         expect(response.statusCode).toBe(404);
         expect(response.body).toEqual(
             JSON.stringify({
-                error: "USK-12",
+                error: "USK-15",
             }),
         );
     });
 
-    test("userIdの実在性を検証する時、ユーザーテーブルと接続できなかった場合、USK-13と500エラーを返す", async () => {
+    test("userIdの実在性を検証する時、ユーザーテーブルと接続できなかった場合、USK-16と500エラーを返す", async () => {
         testSetUp({
             isUsersDBGetSetup: "fail",
             isUserSukiDBPostSetup: "ok",
@@ -352,12 +345,12 @@ describe("異常系", () => {
         expect(response.statusCode).toBe(500);
         expect(response.body).toEqual(
             JSON.stringify({
-                error: "USK-13",
+                error: "USK-16",
             }),
         );
     });
 
-    test("ユーザーの好きな絵文字を登録する時、ユーザーの好きな絵文字テーブルと接続できなかった場合、USK-14と500エラーを返す", async () => {
+    test("ユーザーの好きな絵文字を登録する時、ユーザーの好きな絵文字テーブルと接続できなかった場合、USK-17と500エラーを返す", async () => {
         testSetUp({
             isUsersDBGetSetup: "ok",
             isUserSukiDBPostSetup: "fail",
@@ -378,7 +371,7 @@ describe("異常系", () => {
         expect(response.statusCode).toBe(500);
         expect(response.body).toEqual(
             JSON.stringify({
-                error: "USK-14",
+                error: "USK-17",
             }),
         );
     });
