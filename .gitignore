@@ -3,4 +3,5 @@ node_modules
 .serverless
 .dynamodb
 .env
+.env.prod
 coverage/
