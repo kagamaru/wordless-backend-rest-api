@@ -1077,25 +1077,26 @@ sequenceDiagram
 
 ## 環境変数の一覧
 
-| 環境変数名                                   | 説明                                     |
-| -------------------------------------------- | ---------------------------------------- |
-| VPC_SECURITY_GROUP_ID                        | VPC のセキュリティグループID(RDS接続用)  |
-| VPC_SUBNET_ID                                | VPC のサブネットID(RDS接続用)            |
-| DB_HOST                                      | RDS のホスト                             |
-| DB_USER                                      | RDS のユーザー名                         |
-| DB_PASSWORD                                  | RDS のパスワード                         |
-| DB_NAME                                      | RDS のデータベース名                     |
-| FRONTEND_URL                                 | フロントエンドのURL                      |
-| COGNITO_USER_POOL_ID                         | Cognito のユーザープールID               |
-| COGNITO_USER_POOL_ARN                        | Cognito のユーザープールARN              |
-| COGNITO_CLIENT_ID                            | Cognito のクライアントID                 |
-| COGNITO_AUTHORIZER_ID                        | Cognito の認証者ID                       |
-| USER_IMAGE_BUCKET                            | ユーザー画像のS3バケット名               |
-| CLOUDFRONT_USER_IMAGE_URL                    | ユーザー画像のCloudFront URL             |
-| MY_AWS_REGION                                | 使用しているAWS のリージョン             |
-| TOKEN_VALIDATOR_LAMBDA_NAME                  | JWT検証用のLambda関数名                  |
-| TOKEN_VALIDATOR_AND_GET_USER_SUB_LAMBDA_NAME | JWT検証用のLambda関数名                  |
-| POST_FOLLOW_LAMBDA_NAME                      | フォロー-登録APIのLambda関数名(Core処理) |
-| DELETE_FOLLOW_LAMBDA_NAME                    | フォロー-削除APIのLambda関数名(Core処理) |
-| DELETE_EMOTE_LAMBDA_NAME                     | エモート-削除APIのLambda関数名(Core処理) |
-| DELETE_USER_LAMBDA_NAME                      | ユーザー-削除APIのLambda関数名(Core処理) |
+| 環境変数名                                   | 説明                                       |
+| -------------------------------------------- | ------------------------------------------ |
+| LAMBDA_SECURITY_GROUP_ID                     | Lambda のセキュリティグループID            |
+| VPC_PUBLIC_SUBNET_ID_A                       | VPC のパブリックサブネットID(Lambda接続用) |
+| VPC_PUBLIC_SUBNET_ID_B                       | VPC のパブリックサブネットID(Lambda接続用) |
+| DB_HOST                                      | RDS のホスト                               |
+| DB_USER                                      | RDS のユーザー名                           |
+| DB_PASSWORD                                  | RDS のパスワード                           |
+| DB_NAME                                      | RDS のデータベース名                       |
+| FRONTEND_URL                                 | フロントエンドのURL                        |
+| COGNITO_USER_POOL_ID                         | Cognito のユーザープールID                 |
+| COGNITO_USER_POOL_ARN                        | Cognito のユーザープールARN                |
+| COGNITO_CLIENT_ID                            | Cognito のクライアントID                   |
+| COGNITO_AUTHORIZER_ID                        | Cognito の認証者ID                         |
+| USER_IMAGE_BUCKET                            | ユーザー画像のS3バケット名                 |
+| CLOUDFRONT_USER_IMAGE_URL                    | ユーザー画像のCloudFront URL               |
+| MY_AWS_REGION                                | 使用しているAWS のリージョン               |
+| TOKEN_VALIDATOR_LAMBDA_NAME                  | JWT検証用のLambda関数名                    |
+| TOKEN_VALIDATOR_AND_GET_USER_SUB_LAMBDA_NAME | JWT検証用のLambda関数名                    |
+| POST_FOLLOW_LAMBDA_NAME                      | フォロー-登録APIのLambda関数名(Core処理)   |
+| DELETE_FOLLOW_LAMBDA_NAME                    | フォロー-削除APIのLambda関数名(Core処理)   |
+| DELETE_EMOTE_LAMBDA_NAME                     | エモート-削除APIのLambda関数名(Core処理)   |
+| DELETE_USER_LAMBDA_NAME                      | ユーザー-削除APIのLambda関数名(Core処理)   |
